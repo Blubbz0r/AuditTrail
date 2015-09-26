@@ -31,6 +31,9 @@ std::vector<IO::Node> DataImport::createNodes() const
     sourceMedia.roleIdCode = generateCode(CodeType::SourceMedia);
     nodes.emplace_back(EntityActiveParticipant(sourceMedia).toNode());
 
+    for (const auto& source : m_sources)
+        nodes.emplace_back(EntityActiveParticipant(source).toNode());
+
     return nodes;
 }
 
@@ -48,7 +51,8 @@ void DataImport::addImportingProcess(ActiveParticipant importingProcess)
 
 void DataImport::addSource(ActiveParticipant source)
 {
-
+    source.roleIdCode = generateCode(CodeType::Source);
+    m_sources.emplace_back(std::move(source));
 }
 
 }
