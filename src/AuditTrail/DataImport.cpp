@@ -34,6 +34,9 @@ std::vector<IO::Node> DataImport::createNodes() const
     for (const auto& source : m_sources)
         nodes.emplace_back(EntityActiveParticipant(source).toNode());
 
+    for (const auto& study : m_studies)
+        nodes.emplace_back(study.toNode());
+
     return nodes;
 }
 
@@ -57,7 +60,13 @@ void DataImport::addSource(ActiveParticipant source)
 
 void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
 {
+    EntityParticipantObject study(
+        EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
+        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
 
+    study.setSOPClasses(std::move(sopClasses));
+
+    m_studies.emplace_back(std::move(study));
 }
 
 }
