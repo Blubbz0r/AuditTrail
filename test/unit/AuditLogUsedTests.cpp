@@ -26,15 +26,15 @@ TEST_F(AuditLogUsedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
                               "file:///C:/ProgramData/iQ-ROBOT/AuditLog/log.xml");
 
     ActiveParticipant accessingApplication("111", true);
-    accessingApplication.addAETitle("ROBOT");
-    accessingApplication.userName = "iQ-ROBOT";
+    accessingApplication.addAETitle("ARCHIVE");
+    accessingApplication.userName = "ARCHIVE";
     accessingApplication.networkAccessPointType = NetworkAccessPointType::MachineName;
-    accessingApplication.networkAccessPointId = "WS85";
+    accessingApplication.networkAccessPointId = "CT001";
     auditLogUsed.setAccessingApplication(accessingApplication);
 
-    ActiveParticipant accessingUser("habrich@image-systems.local", true);
-    accessingUser.setAlternativeUserId("IIS\\habrich");
-    accessingUser.userName = "Robert Habrich";
+    ActiveParticipant accessingUser("john.doe@gmail.com", true);
+    accessingUser.setAlternativeUserId("MS\\doe");
+    accessingUser.userName = "John Doe";
     accessingUser.networkAccessPointType = NetworkAccessPointType::TelephoneNumber;
     accessingUser.networkAccessPointId = "123456789";
     auditLogUsed.setAccessingUser(accessingUser);
@@ -110,11 +110,11 @@ void AuditLogUsedTests::checkActiveParticipantApplication(const Node& activePart
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= ROBOT"));
+    EXPECT_THAT(attribute.value, Eq("AETITLES= ARCHIVE"));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("iQ-ROBOT"));
+    EXPECT_THAT(attribute.value, Eq("ARCHIVE"));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -126,7 +126,7 @@ void AuditLogUsedTests::checkActiveParticipantApplication(const Node& activePart
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("WS85"));
+    EXPECT_THAT(attribute.value, Eq("CT001"));
 }
 
 void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant)
@@ -135,15 +135,15 @@ void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("habrich@image-systems.local"));
+    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("IIS\\habrich"));
+    EXPECT_THAT(attribute.value, Eq("MS\\doe"));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("Robert Habrich"));
+    EXPECT_THAT(attribute.value, Eq("John Doe"));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));

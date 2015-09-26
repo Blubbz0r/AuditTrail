@@ -34,7 +34,7 @@ TEST_F(BeginTransferringInstancesTests, createNodes_WithAllAttributes_ReturnsCor
                                                           ActiveParticipant("123", true),
                                                           ActiveParticipant("234", false), "ID123");
 
-    ActiveParticipant otherParticipant("habrich@image-systems.local", false);
+    ActiveParticipant otherParticipant("john.doe@gmail.com", false);
     beginTransferringInstances.addOtherParticipant(otherParticipant);
 
     std::vector<SOPClass> sopClasses;
@@ -192,7 +192,7 @@ void BeginTransferringInstancesTests::checkOtherParticipant(const Node& particip
 
     auto attribute = participant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("habrich@image-systems.local"));
+    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
 
     attribute = participant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));

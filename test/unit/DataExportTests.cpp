@@ -33,8 +33,8 @@ TEST_F(DataExportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     DataExport dataExport(Outcome::Success, MediaType::DVD);
 
-    dataExport.addRemoteUser(ActiveParticipant("habrich@image-systems.local", false));
-    dataExport.setExportingUser(ActiveParticipant("habrich@image-systems.local", true));
+    dataExport.addRemoteUser(ActiveParticipant("john.doe@gmail.com", false));
+    dataExport.setExportingUser(ActiveParticipant("john.doe@gmail.com", true));
 
     std::vector<SOPClass> sopClasses;
     sopClasses.emplace_back(SOPClass{ "1.2.840.10008.5.1.4.1.1.2", 1000 });
@@ -117,7 +117,7 @@ void DataExportTests::checkRemoteUser(const Node& remoteUser)
 
     auto attribute = remoteUser.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("habrich@image-systems.local"));
+    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
 
     attribute = remoteUser.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -153,7 +153,7 @@ void DataExportTests::checkExportingUser(const Node& exportingUser)
 
     auto attribute = exportingUser.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("habrich@image-systems.local"));
+    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
 
     attribute = exportingUser.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));

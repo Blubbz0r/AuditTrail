@@ -24,21 +24,21 @@ public:
 TEST_F(ApplicationActivityTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     ActiveParticipant applicationInfo("123", false);
-    applicationInfo.addAETitle("ROBOT1");
-    applicationInfo.addAETitle("ROBOT2");
-    applicationInfo.userName = "iQ-ROBOT";
+    applicationInfo.addAETitle("ARCHIVE1");
+    applicationInfo.addAETitle("ARCHIVE2");
+    applicationInfo.userName = "ARCHIVE";
     applicationInfo.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    applicationInfo.networkAccessPointId = "192.168.120.111";
+    applicationInfo.networkAccessPointId = "127.0.0.1";
 
     ActiveParticipant involvedApplication("234", true);
-    involvedApplication.addAETitle("SERVER");
-    involvedApplication.userName = "iQ-VIEW";
+    involvedApplication.addAETitle("VIEWER");
+    involvedApplication.userName = "VIEWER";
     involvedApplication.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    involvedApplication.networkAccessPointId = "192.168.120.123";
+    involvedApplication.networkAccessPointId = "127.0.0.1";
 
-    ActiveParticipant involvedUser("habrich@image-systems.local", true);
-    involvedUser.setAlternativeUserId("IIS\\habrich");
-    involvedUser.userName = "Robert Habrich";
+    ActiveParticipant involvedUser("john.doe@gmail.com", true);
+    involvedUser.setAlternativeUserId("MS\\doe");
+    involvedUser.userName = "John Doe";
     involvedUser.networkAccessPointType = NetworkAccessPointType::TelephoneNumber;
     involvedUser.networkAccessPointId = "123456789";
 
@@ -135,11 +135,11 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= ROBOT1;ROBOT2"));
+    EXPECT_THAT(attribute.value, Eq("AETITLES= ARCHIVE1;ARCHIVE2"));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("iQ-ROBOT"));
+    EXPECT_THAT(attribute.value, Eq("ARCHIVE"));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -151,7 +151,7 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("192.168.120.111"));
+    EXPECT_THAT(attribute.value, Eq("127.0.0.1"));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
@@ -188,11 +188,11 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= SERVER"));
+    EXPECT_THAT(attribute.value, Eq("AETITLES= VIEWER"));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("iQ-VIEW"));
+    EXPECT_THAT(attribute.value, Eq("VIEWER"));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -204,7 +204,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("192.168.120.123"));
+    EXPECT_THAT(attribute.value, Eq("127.0.0.1"));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
@@ -219,15 +219,15 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& ac
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("habrich@image-systems.local"));
+    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("IIS\\habrich"));
+    EXPECT_THAT(attribute.value, Eq("MS\\doe"));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("Robert Habrich"));
+    EXPECT_THAT(attribute.value, Eq("John Doe"));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
