@@ -46,4 +46,9 @@ void DataImport::addImportingProcess(ActiveParticipant importingProcess)
     m_importingProcesses.emplace_back(std::move(importingProcess));
 }
 
+void DataImport::addSource(ActiveParticipant source)
+{
+
+}
+
 }

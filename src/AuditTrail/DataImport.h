@@ -30,12 +30,15 @@ public:
 
     void setMediaLabel(std::string mediaLabel) { m_mediaLabel = std::move(mediaLabel); }
 
+    void addSource(ActiveParticipant source);
+
 private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
     std::vector<ActiveParticipant> m_importingProcesses;
     MediaType m_sourceMedia;
     std::string m_mediaLabel;
+    std::vector<ActiveParticipant> m_sources;
 };
 
 }
