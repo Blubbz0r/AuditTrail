@@ -40,6 +40,7 @@ enum class CodeType
     Destination,
     DestinationMedia,
     Export,
+    Import,
     PatientId,
     Source,
     StudyInstanceUid,

@@ -19,7 +19,6 @@ std::vector<IO::Node> DataExport::createNodes() const
     std::vector<IO::Node> nodes;
 
     EntityEvent event(m_outcome, EventActionCode::Read, generateCode(CodeType::Export));
-
     nodes.emplace_back(event.toNode());
 
     for (const auto& remoteUserOrProcess : m_remoteUsersAndProcesses)

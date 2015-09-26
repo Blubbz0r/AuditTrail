@@ -56,6 +56,8 @@ CodedValueType generateCode(CodeType type)
         return CodedValueType{"RoleIDCode", "110154", "Destination Media"};
     case CodeType::Export:
         return CodedValueType{"EventID", "110106", "Export"};
+    case CodeType::Import:
+        return CodedValueType{"EventID", "110107", "Import"};
     case CodeType::PatientId:
         return CodedValueType{"ParticipantObjectIDTypeCode", "2"};
     case CodeType::Source:
