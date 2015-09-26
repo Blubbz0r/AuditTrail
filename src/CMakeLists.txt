@@ -1,0 +1,2 @@
+add_subdirectory(AuditTrail)
+add_subdirectory(Common)
