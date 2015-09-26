@@ -55,4 +55,9 @@ void DataImport::addSource(ActiveParticipant source)
     m_sources.emplace_back(std::move(source));
 }
 
+void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
+{
+
+}
+
 }

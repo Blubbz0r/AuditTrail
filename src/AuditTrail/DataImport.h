@@ -4,6 +4,7 @@
 
 #include "ActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 #include "Media.h"
 
 namespace AuditTrail
@@ -32,6 +33,8 @@ public:
 
     void addSource(ActiveParticipant source);
 
+    void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+
 private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
@@ -39,6 +42,7 @@ private:
     MediaType m_sourceMedia;
     std::string m_mediaLabel;
     std::vector<ActiveParticipant> m_sources;
+    std::vector<EntityParticipantObject> m_studies;
 };
 
 }
