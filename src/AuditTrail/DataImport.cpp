@@ -37,6 +37,15 @@ std::vector<IO::Node> DataImport::createNodes() const
     for (const auto& study : m_studies)
         nodes.emplace_back(study.toNode());
 
+    for (const auto& patient : m_patients)
+    {
+        EntityParticipantObject patientEntity(EntityParticipantObject::Type::Person,
+                                              EntityParticipantObject::Role::Patient,
+                                              generateCode(CodeType::PatientId), patient.first);
+        patientEntity.objectNameOrQuery = patient.second;
+        nodes.emplace_back(patientEntity.toNode());
+    }
+
     return nodes;
 }
 
@@ -71,7 +80,7 @@ void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 
 void DataImport::addPatient(std::string patientId, std::string patientName /*= std::string()*/)
 {
-
+    m_patients.emplace_back(patientId, patientName);
 }
 
 }
