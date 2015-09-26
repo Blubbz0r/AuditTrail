@@ -19,6 +19,7 @@ public:
 TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     DataImport dataImport(Outcome::MinorFailure);
+    dataImport.addImportingUser(ActiveParticipant("john.doe@gmail.com", true));
 
     auto nodes = dataImport.createNodes();
 

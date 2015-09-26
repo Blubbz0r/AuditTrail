@@ -2,6 +2,7 @@
 
 #include "Message.h"
 
+#include "ActiveParticipant.h"
 #include "EntityEvent.h"
 
 namespace AuditTrail
@@ -23,8 +24,13 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
+    void addImportingUser(ActiveParticipant importingUser);
+    void addImportingProcess(ActiveParticipant importingProcess);
+
 private:
     Outcome m_outcome;
+    std::vector<ActiveParticipant> m_importingUsers;
+    std::vector<ActiveParticipant> m_importingProcesses;
 };
 
 }
