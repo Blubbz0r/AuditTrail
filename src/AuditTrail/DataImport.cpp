@@ -5,7 +5,8 @@
 namespace AuditTrail
 {
 
-DataImport::DataImport(Outcome outcome) : m_outcome(outcome)
+DataImport::DataImport(Outcome outcome, MediaType sourceMedia)
+    : m_outcome(outcome), m_sourceMedia(sourceMedia)
 {
 }
 

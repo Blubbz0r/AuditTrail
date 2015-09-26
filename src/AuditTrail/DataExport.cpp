@@ -93,14 +93,4 @@ void DataExport::addPatient(std::string patientId, std::string patientName /*= s
     m_patients.emplace_back(patientId, patientName);
 }
 
-std::string mediaTypeToString(MediaType mediaType)
-{
-    switch (mediaType)
-    {
-    case MediaType::CD:     return "CD";
-    case MediaType::DVD:    return "DVD";
-    default: throw std::logic_error("Unable to convert media type " + std::to_string(static_cast<int>(mediaType)) + " to string");
-    }
-}
-
 }

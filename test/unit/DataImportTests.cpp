@@ -14,16 +14,19 @@ public:
 
     void checkImportingUser(const Node& importingUser);
     void checkRoleIDCodeImportingUser(const Node& roleIDCode);
+
+    void checkSourceMedia(const Node& sourceMedia);
+    void checkRoleIDCodeSourceMedia(const Node& roleIDCode);
 };
 
 TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
-    DataImport dataImport(Outcome::MinorFailure);
+    DataImport dataImport(Outcome::MinorFailure, MediaType::CD);
     dataImport.addImportingUser(ActiveParticipant("john.doe@gmail.com", true));
 
     auto nodes = dataImport.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(2));
+    ASSERT_THAT(nodes.size(), Eq(3));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
@@ -32,6 +35,10 @@ TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkImportingUser(node);
+
+    node = nodes[2];
+    ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
+    checkSourceMedia(node);
 }
 
 void DataImportTests::checkEventIdentification(const Node& eventIdentification)
@@ -108,4 +115,40 @@ void DataImportTests::checkRoleIDCodeImportingUser(const Node& roleIDCode)
     attribute = roleIDCode.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("displayName"));
     EXPECT_THAT(attribute.value, Eq("Destination Role ID"));
+}
+
+void DataImportTests::checkSourceMedia(const Node& sourceMedia)
+{
+    ASSERT_THAT(sourceMedia.attributes().size(), Eq(2));
+
+    auto attribute = sourceMedia.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("UserID"));
+    EXPECT_THAT(attribute.value, Eq("CD"));
+
+    attribute = sourceMedia.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
+    EXPECT_THAT(attribute.value, Eq("false"));
+
+    ASSERT_THAT(sourceMedia.nodes().size(), Eq(1));
+
+    auto node = sourceMedia.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("RoleIDCode"));
+    checkRoleIDCodeSourceMedia(node);
+}
+
+void DataImportTests::checkRoleIDCodeSourceMedia(const Node& roleIDCode)
+{
+    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
+
+    auto attribute = roleIDCode.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("code"));
+    EXPECT_THAT(attribute.value, Eq("110155"));
+
+    attribute = roleIDCode.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
+    EXPECT_THAT(attribute.value, Eq("DCM"));
+
+    attribute = roleIDCode.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("displayName"));
+    EXPECT_THAT(attribute.value, Eq("Source Media"));
 }

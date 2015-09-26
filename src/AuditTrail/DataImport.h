@@ -4,6 +4,7 @@
 
 #include "ActiveParticipant.h"
 #include "EntityEvent.h"
+#include "Media.h"
 
 namespace AuditTrail
 {
@@ -20,7 +21,7 @@ namespace AuditTrail
 class DataImport : public Message
 {
 public:
-    DataImport(Outcome outcome);
+    DataImport(Outcome outcome, MediaType sourceMedia);
 
     std::vector<IO::Node> createNodes() const override;
 
@@ -31,6 +32,7 @@ private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
     std::vector<ActiveParticipant> m_importingProcesses;
+    MediaType m_sourceMedia;
 };
 
 }

@@ -5,19 +5,12 @@
 #include "ActiveParticipant.h"
 #include "EntityEvent.h"
 #include "EntityParticipantObject.h"
+#include "Media.h"
 
 #include <memory>
 
 namespace AuditTrail
 {
-
-enum class MediaType
-{
-    CD,
-    DVD
-};
-
-static std::string mediaTypeToString(MediaType mediaType);
 
 /*!
     \brief  Describes the event of exporting data from a system, meaning that the data is leaving
