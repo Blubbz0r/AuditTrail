@@ -24,6 +24,9 @@ public:
     void checkStudy(const Node& study);
     void checkStudyIdTypeCode(const Node& idTypeCode);
     void checkDescription(const Node& description);
+
+    void checkPatient(const Node& patient);
+    void checkPatientIDTypeCode(const Node& idTypeCode);
 };
 
 TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -36,9 +39,11 @@ TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     sopClasses.emplace_back(SOPClass{"1.2.840.10008.5.1.4.1.1.2", 1000});
     dataImport.addStudy("1.2.2.55.555.84984456465", sopClasses);
 
+    dataImport.addPatient("ID123", "Sandra Newman");
+
     auto nodes = dataImport.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(5));
+    ASSERT_THAT(nodes.size(), Eq(6));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
@@ -59,6 +64,10 @@ TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[4];
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
     checkStudy(node);
+
+    node = nodes[5];
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
+    checkPatient(node);
 }
 
 void DataImportTests::checkEventIdentification(const Node& eventIdentification)
@@ -269,4 +278,39 @@ void DataImportTests::checkDescription(const Node& description)
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
     EXPECT_THAT(attribute.value, Eq("1000"));
+}
+
+void DataImportTests::checkPatient(const Node& patient)
+{
+    ASSERT_THAT(patient.attributes().size(), Eq(3));
+
+    auto attribute = patient.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
+    EXPECT_THAT(attribute.value, Eq("ID123"));
+
+    attribute = patient.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
+    EXPECT_THAT(attribute.value, Eq("1"));
+
+    attribute = patient.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCodeRole"));
+    EXPECT_THAT(attribute.value, Eq("1"));
+
+    ASSERT_THAT(patient.nodes().size(), Eq(2));
+    auto node = patient.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
+    checkPatientIDTypeCode(node);
+
+    node = patient.nodes().at(1);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
+    ASSERT_THAT(node.value(), Eq("Sandra Newman"));
+}
+
+void DataImportTests::checkPatientIDTypeCode(const Node& idTypeCode)
+{
+    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
+
+    auto attribute = idTypeCode.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("code"));
+    EXPECT_THAT(attribute.value, Eq("2"));
 }

@@ -35,6 +35,8 @@ public:
 
     void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
 
+    void addPatient(std::string patientId, std::string patientName = std::string());
+
 private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
@@ -43,6 +45,7 @@ private:
     std::string m_mediaLabel;
     std::vector<ActiveParticipant> m_sources;
     std::vector<EntityParticipantObject> m_studies;
+    std::vector<std::pair<std::string, std::string>> m_patients;
 };
 
 }

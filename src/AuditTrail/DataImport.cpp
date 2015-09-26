@@ -69,4 +69,9 @@ void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
     m_studies.emplace_back(std::move(study));
 }
 
+void DataImport::addPatient(std::string patientId, std::string patientName /*= std::string()*/)
+{
+
+}
+
 }
