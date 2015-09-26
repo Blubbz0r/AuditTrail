@@ -62,6 +62,8 @@ CodedValueType generateCode(CodeType type)
         return CodedValueType{"ParticipantObjectIDTypeCode", "2"};
     case CodeType::Source:
         return CodedValueType{ "RoleIDCode", "110153", "Source Role ID" };
+    case CodeType::SourceMedia:
+        return CodedValueType{"RoleIDCode", "110155", "Source Media"};
     case CodeType::StudyInstanceUid:
         return CodedValueType{ "ParticipantObjectIDTypeCode", "110180", "Study Instance UID" };
     case CodeType::URI:

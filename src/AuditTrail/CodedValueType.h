@@ -43,6 +43,7 @@ enum class CodeType
     Import,
     PatientId,
     Source,
+    SourceMedia,
     StudyInstanceUid,
     URI
 };

@@ -28,11 +28,14 @@ public:
     void addImportingUser(ActiveParticipant importingUser);
     void addImportingProcess(ActiveParticipant importingProcess);
 
+    void setMediaLabel(std::string mediaLabel) { m_mediaLabel = std::move(mediaLabel); }
+
 private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
     std::vector<ActiveParticipant> m_importingProcesses;
     MediaType m_sourceMedia;
+    std::string m_mediaLabel;
 };
 
 }
