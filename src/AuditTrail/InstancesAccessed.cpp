@@ -2,6 +2,7 @@
 
 #include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
@@ -11,6 +12,10 @@ InstancesAccessed::InstancesAccessed(Outcome outcome, Action action)
       m_action(action),
       m_manipulatingPerson(nullptr),
       m_manipulatingProcess(nullptr)
+{
+}
+
+InstancesAccessed::~InstancesAccessed()
 {
 }
 
@@ -55,6 +60,11 @@ void InstancesAccessed::setManipulatingPerson(ActiveParticipant manipulatingPers
 void InstancesAccessed::setManipulatingProcess(ActiveParticipant manipulatingProcess)
 {
     m_manipulatingProcess = std::make_unique<ActiveParticipant>(manipulatingProcess);
+}
+
+void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
+{
+
 }
 
 }
