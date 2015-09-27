@@ -75,4 +75,10 @@ void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPCl
     m_studies.emplace_back(std::move(study));
 }
 
+void InstancesAccessed::addPatient(std::string patientId,
+                                   std::string patientName /*= std::string()*/)
+{
+
+}
+
 }
