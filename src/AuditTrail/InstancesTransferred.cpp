@@ -15,6 +15,7 @@ InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
       m_receivingProcess(receivingProcess)
 {
     m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    m_receivingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
 }
 
 std::vector<IO::Node> InstancesTransferred::createNodes() const
@@ -25,6 +26,7 @@ std::vector<IO::Node> InstancesTransferred::createNodes() const
                       generateEventID(EventIDCode::InstancesTransferred));
     nodes.emplace_back(event.toNode());
     nodes.emplace_back(EntityActiveParticipant(m_sendingProcess).toNode());
+    nodes.emplace_back(EntityActiveParticipant(m_receivingProcess).toNode());
 
     return nodes;
 }
