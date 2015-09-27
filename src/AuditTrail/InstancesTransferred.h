@@ -31,6 +31,8 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
+    void addOtherParticipant(ActiveParticipant otherParticipant);
+
 private:
     EventActionCode actionToActionCode() const;
 

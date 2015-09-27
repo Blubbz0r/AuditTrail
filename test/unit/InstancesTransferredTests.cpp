@@ -19,6 +19,8 @@ public:
 
     void checkReceivingProcess(const Node& receivingProcess);
     void checkReceivingProcessRoleIdCode(const Node& roleIdCode);
+
+    void checkOtherParticipant(const Node& otherParticipant);
 };
 
 TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -28,9 +30,11 @@ TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNo
                                               ActiveParticipant(Process::ArbitraryProcessID, true),
                                               ActiveParticipant(Process::ArbitraryProcessID, false));
 
+    instancesTransferred.addOtherParticipant(ActiveParticipant(User::ArbitraryUserID, false));
+
     auto nodes = instancesTransferred.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(3));
+    ASSERT_THAT(nodes.size(), Eq(4));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
@@ -43,6 +47,10 @@ TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNo
     node = nodes[2];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkReceivingProcess(node);
+
+    node = nodes[3];
+    ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
+    checkOtherParticipant(node);
 }
 
 void InstancesTransferredTests::checkEventIdentification(const Node& eventIdentification)
@@ -155,4 +163,19 @@ void InstancesTransferredTests::checkReceivingProcessRoleIdCode(const Node& role
     attribute = roleIdCode.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("displayName"));
     EXPECT_THAT(attribute.value, Eq("Destination Role ID"));
+}
+
+void InstancesTransferredTests::checkOtherParticipant(const Node& otherParticipant)
+{
+    ASSERT_THAT(otherParticipant.attributes().size(), Eq(2));
+
+    auto attribute = otherParticipant.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("UserID"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
+
+    attribute = otherParticipant.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
+    EXPECT_THAT(attribute.value, Eq("false"));
+
+    ASSERT_THAT(otherParticipant.nodes().size(), Eq(0));
 }

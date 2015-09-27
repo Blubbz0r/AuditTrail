@@ -31,6 +31,11 @@ std::vector<IO::Node> InstancesTransferred::createNodes() const
     return nodes;
 }
 
+void InstancesTransferred::addOtherParticipant(ActiveParticipant otherParticipant)
+{
+
+}
+
 EventActionCode InstancesTransferred::actionToActionCode() const
 {
     switch (m_action)
