@@ -1,6 +1,7 @@
 #include "ApplicationActivity.h"
 
 #include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 
 namespace AuditTrail
 {

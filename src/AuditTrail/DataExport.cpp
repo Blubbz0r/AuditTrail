@@ -1,6 +1,7 @@
 #include "DataExport.h"
 
 #include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 #include "EntityParticipantObject.h"
 
 namespace AuditTrail
@@ -11,6 +12,10 @@ DataExport::DataExport(Outcome outcome, MediaType mediaType)
       m_exportingUser(nullptr),
       m_exportingProcess(nullptr),
       m_mediaType(mediaType)
+{
+}
+
+DataExport::~DataExport()
 {
 }
 

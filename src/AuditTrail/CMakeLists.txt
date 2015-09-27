@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME} ActiveParticipant.h ActiveParticipant.cpp
                             Media.h
                             Message.h
                             Node.h
+                            SOPClass.h
                             Writer.h
                             WriterPugixml.h WriterPugixml.cpp)
 

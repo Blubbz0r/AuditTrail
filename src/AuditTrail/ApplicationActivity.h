@@ -3,7 +3,7 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
-#include "EntityEvent.h"
+#include "Event.h"
 
 namespace AuditTrail
 {

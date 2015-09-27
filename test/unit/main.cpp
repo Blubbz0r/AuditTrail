@@ -2,7 +2,7 @@
 
 #include "LogNoop.h"
 
-Logging::Log* Logger = new Test::LogNoop;
+std::unique_ptr<Logging::Log> Logger = std::make_unique<Test::LogNoop>();
 
 int main(int argc, char** argv)
 {

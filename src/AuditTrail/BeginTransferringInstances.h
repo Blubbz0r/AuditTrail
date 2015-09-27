@@ -3,11 +3,13 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
+#include "Event.h"
+#include "SOPClass.h"
 
 namespace AuditTrail
 {
+
+struct EntityParticipantObject;
 
 /*!
     \brief  Describes the event of a system beginning to transfer a set of DICOM instances from one
@@ -20,6 +22,7 @@ class BeginTransferringInstances : public Message
 public:
     BeginTransferringInstances(Outcome outcome, ActiveParticipant sendingProcess,
                                ActiveParticipant receivingProcess, std::string patientId);
+    ~BeginTransferringInstances();
 
     std::vector<IO::Node> createNodes() const override;
 

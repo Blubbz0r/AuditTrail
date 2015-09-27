@@ -1,6 +1,8 @@
 #include "BeginTransferringInstances.h"
 
 #include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
@@ -16,6 +18,10 @@ BeginTransferringInstances::BeginTransferringInstances(Outcome outcome,
 {
     m_sendingProcess.roleIdCode = generateCode(CodeType::Source);
     m_receivingProcess.roleIdCode = generateCode(CodeType::Destination);
+}
+
+BeginTransferringInstances::~BeginTransferringInstances()
+{
 }
 
 std::vector<IO::Node> BeginTransferringInstances::createNodes() const

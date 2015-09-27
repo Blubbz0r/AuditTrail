@@ -3,14 +3,16 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
+#include "Event.h"
 #include "Media.h"
+#include "SOPClass.h"
 
 #include <memory>
 
 namespace AuditTrail
 {
+
+struct EntityParticipantObject;
 
 /*!
     \brief  Describes the event of exporting data from a system, meaning that the data is leaving
@@ -22,6 +24,7 @@ class DataExport : public Message
 {
 public:
     DataExport(Outcome outcome, MediaType mediaType);
+    ~DataExport();
 
     std::vector<IO::Node> createNodes() const override;
 

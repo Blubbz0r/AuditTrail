@@ -3,12 +3,14 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
-#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "Media.h"
+#include "SOPClass.h"
 
 namespace AuditTrail
 {
+
+struct EntityParticipantObject;
 
 /*!
     \brief  Describes the event of importing data into an organization, implying that the data now
@@ -23,6 +25,7 @@ class DataImport : public Message
 {
 public:
     DataImport(Outcome outcome, Media sourceMedia);
+    ~DataImport();
 
     std::vector<IO::Node> createNodes() const override;
 

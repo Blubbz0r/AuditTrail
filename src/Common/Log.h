@@ -48,4 +48,4 @@ public:
 
 }
 
-extern Logging::Log* Logger;
+extern std::unique_ptr<Logging::Log> Logger;

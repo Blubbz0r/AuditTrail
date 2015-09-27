@@ -2,15 +2,10 @@
 
 #include "Entity.h"
 #include "CodedValueType.h"
+#include "SOPClass.h"
 
 namespace AuditTrail
 {
-
-struct SOPClass
-{
-    std::string uid;
-    int numberOfInstances;
-};
 
 struct EntityParticipantObject : public Entity
 {

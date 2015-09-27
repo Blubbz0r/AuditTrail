@@ -2,12 +2,17 @@
 
 #include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
 
 DataImport::DataImport(Outcome outcome, Media sourceMedia)
     : m_outcome(outcome), m_sourceMedia(sourceMedia)
+{
+}
+
+DataImport::~DataImport()
 {
 }
 

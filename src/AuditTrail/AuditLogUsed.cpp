@@ -1,6 +1,7 @@
 #include "AuditLogUsed.h"
 
 #include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 #include "EntityParticipantObject.h"
 
 namespace AuditTrail
