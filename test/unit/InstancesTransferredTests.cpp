@@ -13,20 +13,28 @@ class InstancesTransferredTests : public Test
 public:
     void checkEventIdentification(const Node& eventIdentification);
     void checkEventId(const Node& eventId);
+
+    void checkSendingProcess(const Node& sendingProcess);
+    void checkSendingProcessRoleIdCode(const Node& roleIdCode);
 };
 
 TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     InstancesTransferred instancesTransferred(Outcome::Success,
-                                              InstancesTransferred::Action::Create);
+                                              InstancesTransferred::Action::Create,
+                                              ActiveParticipant(Process::ArbitraryProcessID, true));
 
     auto nodes = instancesTransferred.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(1));
+    ASSERT_THAT(nodes.size(), Eq(2));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
     checkEventIdentification(node);
+
+    node = nodes[1];
+    ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
+    checkSendingProcess(node);
 }
 
 void InstancesTransferredTests::checkEventIdentification(const Node& eventIdentification)
@@ -67,4 +75,40 @@ void InstancesTransferredTests::checkEventId(const Node& eventId)
     attribute = eventId.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("displayName"));
     EXPECT_THAT(attribute.value, Eq("DICOM Instances Transferred"));
+}
+
+void InstancesTransferredTests::checkSendingProcess(const Node& sendingProcess)
+{
+    ASSERT_THAT(sendingProcess.attributes().size(), Eq(2));
+
+    auto attribute = sendingProcess.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("UserID"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
+
+    attribute = sendingProcess.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
+    EXPECT_THAT(attribute.value, Eq("true"));
+
+    ASSERT_THAT(sendingProcess.nodes().size(), Eq(1));
+
+    auto node = sendingProcess.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("RoleIDCode"));
+    checkSendingProcessRoleIdCode(node);
+}
+
+void InstancesTransferredTests::checkSendingProcessRoleIdCode(const Node& roleIdCode)
+{
+    ASSERT_THAT(roleIdCode.attributes().size(), Eq(3));
+
+    auto attribute = roleIdCode.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("code"));
+    EXPECT_THAT(attribute.value, Eq("110153"));
+
+    attribute = roleIdCode.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
+    EXPECT_THAT(attribute.value, Eq("DCM"));
+
+    attribute = roleIdCode.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("displayName"));
+    EXPECT_THAT(attribute.value, Eq("Source Role ID"));
 }

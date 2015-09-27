@@ -5,8 +5,9 @@
 namespace AuditTrail
 {
 
-InstancesTransferred::InstancesTransferred(Outcome outcome, Action action)
-    : m_outcome(outcome), m_action(action)
+InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
+                                           ActiveParticipant sendingProcess)
+    : m_outcome(outcome), m_action(action), m_sendingProcess(sendingProcess)
 {
 }
 

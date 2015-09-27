@@ -2,6 +2,7 @@
 
 #include "Message.h"
 
+#include "ActiveParticipant.h"
 #include "Event.h"
 
 namespace AuditTrail
@@ -12,6 +13,8 @@ enum class EventActionCode;
 /*!
     \brief  Describes the event of the completion of transferring DICOM SOP instances between two
             application entities.
+
+    \todo   EventDateTime "Shall be the time when the transfer has completed"
 */
 class InstancesTransferred : public Message
 {
@@ -23,7 +26,7 @@ public:
         Update  /*! If the receiver is altering its held copies and the received copies. */
     };
 
-    InstancesTransferred(Outcome outcome, Action action);
+    InstancesTransferred(Outcome outcome, Action action, ActiveParticipant sendingProcess);
 
     std::vector<IO::Node> createNodes() const override;
 
@@ -32,6 +35,7 @@ private:
 
     Outcome m_outcome;
     Action m_action;
+    ActiveParticipant m_sendingProcess;
 };
 
 }
