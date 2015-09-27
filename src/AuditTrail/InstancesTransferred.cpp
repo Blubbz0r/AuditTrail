@@ -7,8 +7,12 @@ namespace AuditTrail
 {
 
 InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
-                                           ActiveParticipant sendingProcess)
-    : m_outcome(outcome), m_action(action), m_sendingProcess(sendingProcess)
+                                           ActiveParticipant sendingProcess,
+                                           ActiveParticipant receivingProcess)
+    : m_outcome(outcome),
+      m_action(action),
+      m_sendingProcess(sendingProcess),
+      m_receivingProcess(receivingProcess)
 {
     m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
 }

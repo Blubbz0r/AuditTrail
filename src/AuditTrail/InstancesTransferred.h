@@ -26,7 +26,8 @@ public:
         Update  /*! If the receiver is altering its held copies and the received copies. */
     };
 
-    InstancesTransferred(Outcome outcome, Action action, ActiveParticipant sendingProcess);
+    InstancesTransferred(Outcome outcome, Action action, ActiveParticipant sendingProcess,
+                         ActiveParticipant receivingProcess);
 
     std::vector<IO::Node> createNodes() const override;
 
@@ -36,6 +37,7 @@ private:
     Outcome m_outcome;
     Action m_action;
     ActiveParticipant m_sendingProcess;
+    ActiveParticipant m_receivingProcess;
 };
 
 }
