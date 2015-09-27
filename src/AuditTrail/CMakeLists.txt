@@ -15,6 +15,7 @@ add_library(${PROJECT_NAME} ActiveParticipant.h ActiveParticipant.cpp
                             EntityEvent.h EntityEvent.cpp
                             EntityParticipantObject.h EntityParticipantObject.cpp
                             Event.h
+                            InstancesAccessed.h InstancesAccessed.cpp
                             Media.h
                             Message.h
                             Node.h
