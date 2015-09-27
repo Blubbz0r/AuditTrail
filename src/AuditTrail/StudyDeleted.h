@@ -2,7 +2,10 @@
 
 #include "Message.h"
 
+#include "ActiveParticipant.h"
 #include "Event.h"
+
+#include <memory>
 
 namespace AuditTrail
 {
@@ -18,8 +21,13 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
+    void setDeletingPerson(ActiveParticipant deletingPerson);
+    void setDeletingProcess(ActiveParticipant deletingProcess);
+
 private:
     Outcome m_outcome;
+    std::unique_ptr<ActiveParticipant> m_deletingPerson;
+    std::unique_ptr<ActiveParticipant> m_deletingProcess;
 };
 
 }
