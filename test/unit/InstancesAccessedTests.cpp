@@ -26,7 +26,8 @@ public:
 
 TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes)
 {
-    InstancesAccessed instancesAccessed(Outcome::Success, InstancesAccessed::Action::Delete);
+    InstancesAccessed instancesAccessed(Outcome::Success, InstancesAccessed::Action::Delete,
+                                        DICOM::ArbitraryPatientID);
     instancesAccessed.setManipulatingPerson(ActiveParticipant(User::ArbitraryUserID, false));
 
     std::vector<SOPClass> sopClasses;
@@ -34,7 +35,7 @@ TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes
         SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
     instancesAccessed.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
-    instancesAccessed.addPatient(DICOM::ArbitraryPatientID, DICOM::ArbitraryPatientName);
+    instancesAccessed.setPatientName(DICOM::ArbitraryPatientName);
 
     auto nodes = instancesAccessed.createNodes();
 

@@ -7,11 +7,12 @@
 namespace AuditTrail
 {
 
-InstancesAccessed::InstancesAccessed(Outcome outcome, Action action)
+InstancesAccessed::InstancesAccessed(Outcome outcome, Action action, std::string patientId)
     : m_outcome(outcome),
       m_action(action),
       m_manipulatingPerson(nullptr),
-      m_manipulatingProcess(nullptr)
+      m_manipulatingProcess(nullptr),
+      m_patientId(std::move(patientId))
 {
 }
 
@@ -35,15 +36,11 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
     for (const auto& study : m_studies)
         nodes.emplace_back(study.toNode());
 
-    for (const auto& patient : m_patients)
-    {
-        EntityParticipantObject patientEntity(
-            EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
-            generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
-            patient.first);
-        patientEntity.objectNameOrQuery = patient.second;
-        nodes.emplace_back(patientEntity.toNode());
-    }
+    EntityParticipantObject patient(
+        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), m_patientId);
+    patient.objectNameOrQuery = m_patientName;
+    nodes.emplace_back(patient.toNode());
 
     return nodes;
 }
@@ -84,12 +81,6 @@ void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPCl
 
     study.setSOPClasses(std::move(sopClasses));
     m_studies.emplace_back(std::move(study));
-}
-
-void InstancesAccessed::addPatient(std::string patientId,
-                                   std::string patientName /*= std::string()*/)
-{
-    m_patients.emplace_back(std::move(patientId), std::move(patientName));
 }
 
 }
