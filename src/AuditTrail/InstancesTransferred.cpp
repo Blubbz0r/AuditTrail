@@ -36,6 +36,9 @@ std::vector<IO::Node> InstancesTransferred::createNodes() const
     for (const auto& otherParticipant : m_otherParticipants)
         nodes.emplace_back(EntityActiveParticipant(otherParticipant).toNode());
 
+    for (const auto& study : m_studies)
+        nodes.emplace_back(study.toNode());
+
     return nodes;
 }
 
@@ -61,7 +64,13 @@ EventActionCode InstancesTransferred::actionToActionCode() const
 
 void InstancesTransferred::addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses)
 {
+    EntityParticipantObject study(
+        EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUID));
 
+    study.setSOPClasses(std::move(sopClasses));
+    m_studies.emplace_back(std::move(study));
 }
 
 }
