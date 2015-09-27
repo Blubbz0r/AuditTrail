@@ -7,8 +7,11 @@
 namespace AuditTrail
 {
 
-StudyDeleted::StudyDeleted(Outcome outcome)
-    : m_outcome(outcome), m_deletingPerson(nullptr), m_deletingProcess(nullptr)
+StudyDeleted::StudyDeleted(Outcome outcome, std::string patientID)
+    : m_outcome(outcome),
+      m_deletingPerson(nullptr),
+      m_deletingProcess(nullptr),
+      m_patientID(std::move(patientID))
 {
 }
 
