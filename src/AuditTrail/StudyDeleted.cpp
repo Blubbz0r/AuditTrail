@@ -1,5 +1,6 @@
 #include "StudyDeleted.h"
 
+#include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
 
 namespace AuditTrail
@@ -17,6 +18,12 @@ std::vector<IO::Node> StudyDeleted::createNodes() const
     EntityEvent event(m_outcome, EventActionCode::Delete,
                       generateEventID(EventIDCode::StudyDeleted));
     nodes.emplace_back(event.toNode());
+
+    if (m_deletingPerson)
+        nodes.emplace_back(EntityActiveParticipant(*m_deletingPerson).toNode());
+
+    if (m_deletingProcess)
+        nodes.emplace_back(EntityActiveParticipant(*m_deletingProcess).toNode());
 
     return nodes;
 }

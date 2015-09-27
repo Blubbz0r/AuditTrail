@@ -81,7 +81,7 @@ void StudyDeletedTests::checkDeletingPerson(const Node& deletingPerson)
 
     auto attribute = deletingPerson.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = deletingPerson.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
