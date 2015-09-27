@@ -23,7 +23,7 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, actionToActionCode(), generateCode(CodeType::InstancesAccessed));
+    EntityEvent event(m_outcome, actionToActionCode(), generateEventID(EventIDCode::InstancesAccessed));
     nodes.emplace_back(event.toNode());
 
     if (m_manipulatingPerson)
@@ -37,9 +37,10 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
 
     for (const auto& patient : m_patients)
     {
-        EntityParticipantObject patientEntity(EntityParticipantObject::Type::Person,
-                                              EntityParticipantObject::Role::Patient,
-                                              generateCode(CodeType::PatientId), patient.first);
+        EntityParticipantObject patientEntity(
+            EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+            generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
+            patient.first);
         patientEntity.objectNameOrQuery = patient.second;
         nodes.emplace_back(patientEntity.toNode());
     }
@@ -78,7 +79,8 @@ void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPCl
 {
     EntityParticipantObject study(
         EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
-        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUid));
 
     study.setSOPClasses(std::move(sopClasses));
     m_studies.emplace_back(std::move(study));

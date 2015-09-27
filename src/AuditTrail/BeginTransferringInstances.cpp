@@ -16,8 +16,8 @@ BeginTransferringInstances::BeginTransferringInstances(Outcome outcome,
       m_receivingProcess(std::move(receivingProcess)),
       m_patientId(std::move(patientId))
 {
-    m_sendingProcess.roleIdCode = generateCode(CodeType::Source);
-    m_receivingProcess.roleIdCode = generateCode(CodeType::Destination);
+    m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    m_receivingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
 }
 
 BeginTransferringInstances::~BeginTransferringInstances()
@@ -29,7 +29,7 @@ std::vector<IO::Node> BeginTransferringInstances::createNodes() const
     std::vector<IO::Node> nodes;
 
     EntityEvent event(m_outcome, EventActionCode::Execute,
-                      generateCode(CodeType::BeginTransferringInstances));
+                      generateEventID(EventIDCode::BeginTransferringInstances));
 
     nodes.emplace_back(event.toNode());
     nodes.emplace_back(EntityActiveParticipant(m_sendingProcess).toNode());
@@ -41,9 +41,9 @@ std::vector<IO::Node> BeginTransferringInstances::createNodes() const
     for (const auto& study : m_studies)
         nodes.emplace_back(study.toNode());
 
-    EntityParticipantObject patient(EntityParticipantObject::Type::Person,
-                                    EntityParticipantObject::Role::Patient,
-                                    generateCode(CodeType::PatientId), m_patientId);
+    EntityParticipantObject patient(
+        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), m_patientId);
     patient.objectNameOrQuery = m_patientName;
     nodes.emplace_back(patient.toNode());
 
@@ -60,7 +60,8 @@ void BeginTransferringInstances::addStudy(std::string studyInstanceUid,
 {
     EntityParticipantObject study(
         EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
-        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUid));
 
     study.setSOPClasses(std::move(sopClasses));
 

@@ -10,7 +10,7 @@ ApplicationActivity::ApplicationActivity(ApplicationEvent event, Outcome outcome
                                          ActiveParticipant applicationInfo)
     : m_event(event), m_outcome(outcome), m_applicationInfo(std::move(applicationInfo))
 {
-    m_applicationInfo.roleIdCode = generateCode(CodeType::Application);
+    m_applicationInfo.roleIdCode = generateRoleIDCode(RoleIDCode::Application);
 }
 
 std::vector<IO::Node> ApplicationActivity::createNodes() const
@@ -18,23 +18,23 @@ std::vector<IO::Node> ApplicationActivity::createNodes() const
     std::vector<IO::Node> nodes;
 
     EntityEvent event(m_outcome, EventActionCode::Execute,
-                      generateCode(CodeType::ApplicationActivity));
-    event.eventTypeCode
-        = generateCode(m_event == ApplicationEvent::Started ? CodeType::ApplicationStart
-                                                             : CodeType::ApplicationStop);
+                      generateEventID(EventIDCode::ApplicationActivity));
+    event.eventTypeCode = generateEventTypeCode(m_event == ApplicationEvent::Started
+                                                    ? EventTypeCode::ApplicationStart
+                                                    : EventTypeCode::ApplicationStop);
     nodes.emplace_back(event.toNode());
 
     nodes.emplace_back(EntityActiveParticipant(m_applicationInfo).toNode());
 
     for (auto involvedApplication : m_involvedApplications)
     {
-        involvedApplication.roleIdCode = generateCode(CodeType::ApplicationLauncher);
+        involvedApplication.roleIdCode = generateRoleIDCode(RoleIDCode::ApplicationLauncher);
         nodes.emplace_back(EntityActiveParticipant(involvedApplication).toNode());
     }
 
     for (auto involvedUser : m_involvedUsers)
     {
-        involvedUser.roleIdCode = generateCode(CodeType::ApplicationLauncher);
+        involvedUser.roleIdCode = generateRoleIDCode(RoleIDCode::ApplicationLauncher);
         nodes.emplace_back(EntityActiveParticipant(involvedUser).toNode());
     }
 

@@ -23,7 +23,7 @@ std::vector<IO::Node> DataExport::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Read, generateCode(CodeType::Export));
+    EntityEvent event(m_outcome, EventActionCode::Read, generateEventID(EventIDCode::Export));
     nodes.emplace_back(event.toNode());
 
     for (const auto& remoteUserOrProcess : m_remoteUsersAndProcesses)
@@ -40,7 +40,7 @@ std::vector<IO::Node> DataExport::createNodes() const
         mediaId += " " + m_mediaLabel;
 
     ActiveParticipant media(mediaId, false);
-    media.roleIdCode = generateCode(CodeType::DestinationMedia);
+    media.roleIdCode = generateRoleIDCode(RoleIDCode::DestinationMedia);
     nodes.emplace_back(EntityActiveParticipant(media).toNode());
 
     for (const auto& study : m_studies)
@@ -48,9 +48,10 @@ std::vector<IO::Node> DataExport::createNodes() const
 
     for (const auto& patient : m_patients)
     {
-        EntityParticipantObject patientEntity(EntityParticipantObject::Type::Person,
-                                              EntityParticipantObject::Role::Patient,
-                                              generateCode(CodeType::PatientId), patient.first);
+        EntityParticipantObject patientEntity(
+            EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+            generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
+            patient.first);
         patientEntity.objectNameOrQuery = patient.second;
         nodes.emplace_back(patientEntity.toNode());
     }
@@ -60,25 +61,25 @@ std::vector<IO::Node> DataExport::createNodes() const
 
 void DataExport::addRemoteUser(ActiveParticipant remoteUser)
 {
-    remoteUser.roleIdCode = generateCode(CodeType::Destination);
+    remoteUser.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
     m_remoteUsersAndProcesses.emplace_back(std::move(remoteUser));
 }
 
 void DataExport::addRemoteProcess(ActiveParticipant remoteProcess)
 {
-    remoteProcess.roleIdCode = generateCode(CodeType::Destination);
+    remoteProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
     m_remoteUsersAndProcesses.emplace_back(std::move(remoteProcess));
 }
 
 void DataExport::setExportingUser(ActiveParticipant exportingUser)
 {
-    exportingUser.roleIdCode = generateCode(CodeType::Source);
+    exportingUser.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
     m_exportingUser = std::make_unique<ActiveParticipant>(exportingUser);
 }
 
 void DataExport::setExportingProcess(ActiveParticipant exportingProcess)
 {
-    exportingProcess.roleIdCode = generateCode(CodeType::Source);
+    exportingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
     m_exportingProcess = std::make_unique<ActiveParticipant>(exportingProcess);
 }
 
@@ -86,7 +87,8 @@ void DataExport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 {
     EntityParticipantObject study(
         EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
-        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUid));
 
     study.setSOPClasses(std::move(sopClasses));
 

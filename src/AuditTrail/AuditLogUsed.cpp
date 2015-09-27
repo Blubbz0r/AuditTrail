@@ -19,7 +19,7 @@ std::vector<IO::Node> AuditLogUsed::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Read, generateCode(CodeType::AuditLogUsed));
+    EntityEvent event(m_outcome, EventActionCode::Read, generateEventID(EventIDCode::AuditLogUsed));
     nodes.emplace_back(event.toNode());
 
     if (m_accessingApplication)
@@ -27,9 +27,10 @@ std::vector<IO::Node> AuditLogUsed::createNodes() const
     if (m_accessingUser)
         nodes.emplace_back(EntityActiveParticipant(*m_accessingUser).toNode());
 
-    EntityParticipantObject auditLog(EntityParticipantObject::Type::SystemObject,
-                                     EntityParticipantObject::Role::SecurityResource,
-                                     generateCode(CodeType::URI), m_auditLogUri);
+    EntityParticipantObject auditLog(
+        EntityParticipantObject::Type::SystemObject,
+        EntityParticipantObject::Role::SecurityResource,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::URI), m_auditLogUri);
     auditLog.objectNameOrQuery = "Security Audit Log";
 
     nodes.emplace_back(auditLog.toNode());

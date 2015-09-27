@@ -20,7 +20,7 @@ std::vector<IO::Node> DataImport::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Create, generateCode(CodeType::Import));
+    EntityEvent event(m_outcome, EventActionCode::Create, generateEventID(EventIDCode::Import));
     nodes.emplace_back(event.toNode());
 
     for (const auto& importingUser : m_importingUsers)
@@ -30,7 +30,7 @@ std::vector<IO::Node> DataImport::createNodes() const
         nodes.emplace_back(EntityActiveParticipant(importingProcess).toNode());
 
     ActiveParticipant sourceMedia(m_sourceMedia.mediaId(), false);
-    sourceMedia.roleIdCode = generateCode(CodeType::SourceMedia);
+    sourceMedia.roleIdCode = generateRoleIDCode(RoleIDCode::SourceMedia);
     nodes.emplace_back(EntityActiveParticipant(sourceMedia).toNode());
 
     for (const auto& source : m_sources)
@@ -41,9 +41,10 @@ std::vector<IO::Node> DataImport::createNodes() const
 
     for (const auto& patient : m_patients)
     {
-        EntityParticipantObject patientEntity(EntityParticipantObject::Type::Person,
-                                              EntityParticipantObject::Role::Patient,
-                                              generateCode(CodeType::PatientId), patient.first);
+        EntityParticipantObject patientEntity(
+            EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+            generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
+            patient.first);
         patientEntity.objectNameOrQuery = patient.second;
         nodes.emplace_back(patientEntity.toNode());
     }
@@ -53,19 +54,19 @@ std::vector<IO::Node> DataImport::createNodes() const
 
 void DataImport::addImportingUser(ActiveParticipant importingUser)
 {
-    importingUser.roleIdCode = generateCode(CodeType::Destination);
+    importingUser.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
     m_importingUsers.emplace_back(std::move(importingUser));
 }
 
 void DataImport::addImportingProcess(ActiveParticipant importingProcess)
 {
-    importingProcess.roleIdCode = generateCode(CodeType::Destination);
+    importingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
     m_importingProcesses.emplace_back(std::move(importingProcess));
 }
 
 void DataImport::addSource(ActiveParticipant source)
 {
-    source.roleIdCode = generateCode(CodeType::Source);
+    source.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
     m_sources.emplace_back(std::move(source));
 }
 
@@ -73,7 +74,8 @@ void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 {
     EntityParticipantObject study(
         EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
-        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUid));
 
     study.setSOPClasses(std::move(sopClasses));
 

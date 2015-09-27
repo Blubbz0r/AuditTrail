@@ -28,28 +28,46 @@ private:
     std::string m_displayName;
 };
 
-enum class CodeType
+enum class EventIDCode
 {
-    Application,
     ApplicationActivity,
-    ApplicationLauncher,
-    ApplicationStart,
-    ApplicationStop,
     AuditLogUsed,
     BeginTransferringInstances,
-    Destination,
-    DestinationMedia,
     Export,
     Import,
     InstancesAccessed,
-    InstancesTransferred,
+    InstancesTransferred
+};
+
+CodedValueType generateEventID(EventIDCode eventID);
+
+enum class EventTypeCode
+{
+    ApplicationStart,
+    ApplicationStop
+};
+
+CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode);
+
+enum class ParticipantObjectIDTypeCode
+{
     PatientId,
-    Source,
-    SourceMedia,
     StudyInstanceUid,
     URI
 };
 
-CodedValueType generateCode(CodeType type);
+CodedValueType generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode idTypeCode);
+
+enum class RoleIDCode
+{
+    Application,
+    ApplicationLauncher,
+    Destination,
+    DestinationMedia,
+    Source,
+    SourceMedia
+};
+
+CodedValueType generateRoleIDCode(RoleIDCode roleIDCode);
 
 }

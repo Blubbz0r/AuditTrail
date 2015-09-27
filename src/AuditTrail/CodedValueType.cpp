@@ -32,48 +32,75 @@ IO::Node CodedValueType::toNode() const
     return eventId;
 }
 
-CodedValueType generateCode(CodeType type)
+CodedValueType generateEventID(EventIDCode eventID)
 {
-    switch (type)
+    switch (eventID)
     {
-    case CodeType::Application:
-        return CodedValueType{"RoleIDCode", "110150", "Application"};
-    case CodeType::ApplicationActivity:
+    case EventIDCode::ApplicationActivity:
         return CodedValueType{"EventID", "110100", "Application Activity"};
-    case CodeType::ApplicationLauncher:
-        return CodedValueType{"RoleIDCode", "110151", "Application Launcher"};
-    case CodeType::ApplicationStart:
-        return CodedValueType{"EventTypeCode", "110120", "Application Start"};
-    case CodeType::ApplicationStop:
-        return CodedValueType{"EventTypeCode", "110121", "Application Stop"};
-    case CodeType::AuditLogUsed:
+    case EventIDCode::AuditLogUsed:
         return CodedValueType{"EventID", "110101", "Audit Log Used"};
-    case CodeType::BeginTransferringInstances:
+    case EventIDCode::BeginTransferringInstances:
         return CodedValueType{"EventID", "110102", "Begin Transferring DICOM Instances"};
-    case CodeType::Destination:
-        return CodedValueType{ "RoleIDCode", "110152", "Destination Role ID" };
-    case CodeType::DestinationMedia:
-        return CodedValueType{"RoleIDCode", "110154", "Destination Media"};
-    case CodeType::Export:
+    case EventIDCode::Export:
         return CodedValueType{"EventID", "110106", "Export"};
-    case CodeType::Import:
+    case EventIDCode::Import:
         return CodedValueType{"EventID", "110107", "Import"};
-    case CodeType::InstancesAccessed:
+    case EventIDCode::InstancesAccessed:
         return CodedValueType{"EventID", "110103", "DICOM Instances Accessed"};
-    case CodeType::InstancesTransferred:
+    case EventIDCode::InstancesTransferred:
         return CodedValueType{"EventID", "110104", "DICOM Instances Transferred"};
-    case CodeType::PatientId:
-        return CodedValueType{"ParticipantObjectIDTypeCode", "2"};
-    case CodeType::Source:
-        return CodedValueType{ "RoleIDCode", "110153", "Source Role ID" };
-    case CodeType::SourceMedia:
-        return CodedValueType{"RoleIDCode", "110155", "Source Media"};
-    case CodeType::StudyInstanceUid:
-        return CodedValueType{ "ParticipantObjectIDTypeCode", "110180", "Study Instance UID" };
-    case CodeType::URI:
-        return CodedValueType{"ParticipantObjectIDTypeCode", "12"};
     default:
-        throw std::logic_error("Unable to convert event type " + std::to_string(static_cast<int>(type)) + " to event");
+        throw std::logic_error("Unable to generate event id code from " + std::to_string(static_cast<int>(eventID)));
+    }
+}
+
+CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode)
+{
+    switch (eventTypeCode)
+    {
+    case EventTypeCode::ApplicationStart:
+        return CodedValueType{ "EventTypeCode", "110120", "Application Start" };
+    case EventTypeCode::ApplicationStop:
+        return CodedValueType{ "EventTypeCode", "110121", "Application Stop" };
+    default:
+        throw std::logic_error("Unable to generate event type code from " + std::to_string(static_cast<int>(eventTypeCode)));
+    }
+}
+
+CodedValueType generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode idTypeCode)
+{
+    switch (idTypeCode)
+    {
+    case ParticipantObjectIDTypeCode::PatientId:
+        return CodedValueType{ "ParticipantObjectIDTypeCode", "2" };
+    case ParticipantObjectIDTypeCode::StudyInstanceUid:
+        return CodedValueType{ "ParticipantObjectIDTypeCode", "110180", "Study Instance UID" };
+    case ParticipantObjectIDTypeCode::URI:
+        return CodedValueType{ "ParticipantObjectIDTypeCode", "12" };
+    default:
+        throw std::logic_error("Unable to generate participant object id type code from " + std::to_string(static_cast<int>(idTypeCode)));
+    }
+}
+
+CodedValueType generateRoleIDCode(RoleIDCode roleIDCode)
+{
+    switch (roleIDCode)
+    {
+    case RoleIDCode::Application:
+        return CodedValueType{ "RoleIDCode", "110150", "Application" };
+    case RoleIDCode::ApplicationLauncher:
+        return CodedValueType{ "RoleIDCode", "110151", "Application Launcher" };
+    case RoleIDCode::Destination:
+        return CodedValueType{ "RoleIDCode", "110152", "Destination Role ID" };
+    case RoleIDCode::DestinationMedia:
+        return CodedValueType{ "RoleIDCode", "110154", "Destination Media" };
+    case RoleIDCode::Source:
+        return CodedValueType{ "RoleIDCode", "110153", "Source Role ID" };
+    case RoleIDCode::SourceMedia:
+        return CodedValueType{ "RoleIDCode", "110155", "Source Media" };
+    default:
+        throw std::logic_error("Unable to generate role id code from " + std::to_string(static_cast<int>(roleIDCode)));
     }
 }
 
