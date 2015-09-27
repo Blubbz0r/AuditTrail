@@ -28,12 +28,15 @@ std::vector<IO::Node> InstancesTransferred::createNodes() const
     nodes.emplace_back(EntityActiveParticipant(m_sendingProcess).toNode());
     nodes.emplace_back(EntityActiveParticipant(m_receivingProcess).toNode());
 
+    for (const auto& otherParticipant : m_otherParticipants)
+        nodes.emplace_back(EntityActiveParticipant(otherParticipant).toNode());
+
     return nodes;
 }
 
 void InstancesTransferred::addOtherParticipant(ActiveParticipant otherParticipant)
 {
-
+    m_otherParticipants.emplace_back(std::move(otherParticipant));
 }
 
 EventActionCode InstancesTransferred::actionToActionCode() const

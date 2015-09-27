@@ -40,6 +40,7 @@ private:
     Action m_action;
     ActiveParticipant m_sendingProcess;
     ActiveParticipant m_receivingProcess;
+    std::vector<ActiveParticipant> m_otherParticipants;
 };
 
 }
