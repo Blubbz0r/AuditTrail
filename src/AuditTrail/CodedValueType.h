@@ -36,7 +36,8 @@ enum class EventIDCode
     Export,
     Import,
     InstancesAccessed,
-    InstancesTransferred
+    InstancesTransferred,
+    StudyDeleted
 };
 
 CodedValueType generateEventID(EventIDCode eventID);

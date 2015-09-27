@@ -42,7 +42,7 @@ void StudyDeletedTests::checkEventIdentification(const Node& eventIdentification
 
     attribute = eventIdentification.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::Success))));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::MinorFailure))));
 
     ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
 

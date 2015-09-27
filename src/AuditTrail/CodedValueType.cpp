@@ -50,6 +50,8 @@ CodedValueType generateEventID(EventIDCode eventID)
         return CodedValueType{"EventID", "110103", "DICOM Instances Accessed"};
     case EventIDCode::InstancesTransferred:
         return CodedValueType{"EventID", "110104", "DICOM Instances Transferred"};
+    case EventIDCode::StudyDeleted:
+        return CodedValueType{"EventID", "110105", "DICOM Study Deleted"};
     default:
         throw std::logic_error("Unable to generate event id code from " + std::to_string(static_cast<int>(eventID)));
     }
