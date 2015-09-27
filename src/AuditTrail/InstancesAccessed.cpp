@@ -6,7 +6,10 @@ namespace AuditTrail
 {
 
 InstancesAccessed::InstancesAccessed(Outcome outcome, Action action)
-    : m_outcome(outcome), m_action(action)
+    : m_outcome(outcome),
+      m_action(action),
+      m_manipulatingPerson(nullptr),
+      m_manipulatingProcess(nullptr)
 {
 }
 
@@ -35,6 +38,16 @@ EventActionCode InstancesAccessed::actionToActionCode() const
     default:
         throw std::logic_error("Unable to convert action " + std::to_string(static_cast<int>(m_action)) + " to action code.");
     }
+}
+
+void InstancesAccessed::setManipulatingPerson(ActiveParticipant manipulatingPerson)
+{
+    m_manipulatingPerson = std::make_unique<ActiveParticipant>(manipulatingPerson);
+}
+
+void InstancesAccessed::setManipulatingProcess(ActiveParticipant manipulatingProcess)
+{
+    m_manipulatingProcess = std::make_unique<ActiveParticipant>(manipulatingProcess);
 }
 
 }

@@ -13,6 +13,9 @@ class InstancesAccessedTests : public Test
 public:
     void checkEventIdentification(const Node& eventIdentification);
     void checkEventId(const Node& eventId);
+
+    void checkManipulatingPerson(const Node& manipulatingPerson);
+    void checkRoleIDCodeManipulatingPerson(const Node& roleIDCode);
 };
 
 TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes)
@@ -21,11 +24,15 @@ TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes
 
     auto nodes = instancesAccessed.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(1));
+    ASSERT_THAT(nodes.size(), Eq(2));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
     checkEventIdentification(node);
+
+    node = nodes[1];
+    ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
+    checkManipulatingPerson(node);
 }
 
 void InstancesAccessedTests::checkEventIdentification(const Node& eventIdentification)
@@ -66,4 +73,19 @@ void InstancesAccessedTests::checkEventId(const Node& eventId)
     attribute = eventId.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("displayName"));
     EXPECT_THAT(attribute.value, Eq("DICOM Instances Accessed"));
+}
+
+void InstancesAccessedTests::checkManipulatingPerson(const Node& manipulatingPerson)
+{
+    ASSERT_THAT(manipulatingPerson.attributes().size(), Eq(2));
+
+    auto attribute = manipulatingPerson.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("UserID"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
+
+    attribute = manipulatingPerson.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
+    EXPECT_THAT(attribute.value, Eq("false"));
+
+    ASSERT_THAT(manipulatingPerson.nodes().size(), Eq(0));
 }
