@@ -30,6 +30,9 @@ std::vector<IO::Node> StudyDeleted::createNodes() const
     if (m_deletingProcess)
         nodes.emplace_back(EntityActiveParticipant(*m_deletingProcess).toNode());
 
+    for (const auto& study : m_studies)
+        nodes.emplace_back(EntityParticipantObject(study).toNode());
+
     return nodes;
 }
 
@@ -43,9 +46,15 @@ void StudyDeleted::setDeletingProcess(ActiveParticipant deletingProcess)
     m_deletingProcess = std::make_unique<ActiveParticipant>(deletingProcess);
 }
 
-void StudyDeleted::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
+void StudyDeleted::addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses)
 {
+    EntityParticipantObject study(
+        EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::StudyInstanceUid),
+        std::move(studyInstanceUID));
 
+    study.setSOPClasses(std::move(sopClasses));
+    m_studies.emplace_back(std::move(study));
 }
 
 }

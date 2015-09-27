@@ -28,7 +28,7 @@ public:
     void setDeletingPerson(ActiveParticipant deletingPerson);
     void setDeletingProcess(ActiveParticipant deletingProcess);
 
-    void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+    void addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses);
 
 private:
     Outcome m_outcome;
