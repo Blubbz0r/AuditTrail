@@ -9,11 +9,13 @@ namespace AuditTrail
 
 InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
                                            ActiveParticipant sendingProcess,
-                                           ActiveParticipant receivingProcess)
+                                           ActiveParticipant receivingProcess,
+                                           std::string patientId)
     : m_outcome(outcome),
       m_action(action),
       m_sendingProcess(sendingProcess),
-      m_receivingProcess(receivingProcess)
+      m_receivingProcess(receivingProcess),
+      m_patientId(std::move(patientId))
 {
     m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
     m_receivingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);

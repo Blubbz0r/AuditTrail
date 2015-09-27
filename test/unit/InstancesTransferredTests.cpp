@@ -25,14 +25,17 @@ public:
     void checkStudy(const Node& study);
     void checkStudyIdTypeCode(const Node& idTypeCode);
     void checkDescription(const Node& description);
+
+    void checkPatient(const Node& patient);
+    void checkPatientIDTypeCode(const Node& idTypeCode);
 };
 
 TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
-    InstancesTransferred instancesTransferred(Outcome::Success,
-                                              InstancesTransferred::Action::Create,
-                                              ActiveParticipant(Process::ArbitraryProcessID, true),
-                                              ActiveParticipant(Process::ArbitraryProcessID, false));
+    InstancesTransferred instancesTransferred(
+        Outcome::Success, InstancesTransferred::Action::Create,
+        ActiveParticipant(Process::ArbitraryProcessID, true),
+        ActiveParticipant(Process::ArbitraryProcessID, false), DICOM::ArbitraryPatientID);
 
     instancesTransferred.addOtherParticipant(ActiveParticipant(User::ArbitraryUserID, false));
 
@@ -40,9 +43,11 @@ TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNo
     sopClasses.emplace_back(SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
     instancesTransferred.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
+    instancesTransferred.setPatientName(DICOM::ArbitraryPatientName);
+
     auto nodes = instancesTransferred.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(5));
+    ASSERT_THAT(nodes.size(), Eq(6));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
@@ -63,6 +68,10 @@ TEST_F(InstancesTransferredTests, createNodes_WithAllAttributes_ReturnsCorrectNo
     node = nodes[4];
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
     checkStudy(node);
+
+    node = nodes[5];
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
+    checkPatient(node);
 }
 
 void InstancesTransferredTests::checkEventIdentification(const Node& eventIdentification)
@@ -253,4 +262,39 @@ void InstancesTransferredTests::checkDescription(const Node& description)
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
     EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
+}
+
+void InstancesTransferredTests::checkPatient(const Node& patient)
+{
+    ASSERT_THAT(patient.attributes().size(), Eq(3));
+
+    auto attribute = patient.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryPatientID));
+
+    attribute = patient.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
+    EXPECT_THAT(attribute.value, Eq("1"));
+
+    attribute = patient.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCodeRole"));
+    EXPECT_THAT(attribute.value, Eq("1"));
+
+    ASSERT_THAT(patient.nodes().size(), Eq(2));
+    auto node = patient.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
+    checkPatientIDTypeCode(node);
+
+    node = patient.nodes().at(1);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
+    ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
+}
+
+void InstancesTransferredTests::checkPatientIDTypeCode(const Node& idTypeCode)
+{
+    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
+
+    auto attribute = idTypeCode.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("code"));
+    EXPECT_THAT(attribute.value, Eq("2"));
 }

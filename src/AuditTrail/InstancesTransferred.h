@@ -29,13 +29,16 @@ public:
     };
 
     InstancesTransferred(Outcome outcome, Action action, ActiveParticipant sendingProcess,
-                         ActiveParticipant receivingProcess);
+                         ActiveParticipant receivingProcess, std::string patientId);
     ~InstancesTransferred();
 
     std::vector<IO::Node> createNodes() const override;
 
     void addOtherParticipant(ActiveParticipant otherParticipant);
+
     void addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses);
+
+    void setPatientName(std::string patientName) { m_patientName = std::move(patientName); }
 
 private:
     EventActionCode actionToActionCode() const;
@@ -46,6 +49,8 @@ private:
     ActiveParticipant m_receivingProcess;
     std::vector<ActiveParticipant> m_otherParticipants;
     std::vector<EntityParticipantObject> m_studies;
+    std::string m_patientId;
+    std::string m_patientName;
 };
 
 }
