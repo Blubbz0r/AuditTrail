@@ -60,6 +60,8 @@ CodedValueType generateCode(CodeType type)
         return CodedValueType{"EventID", "110107", "Import"};
     case CodeType::InstancesAccessed:
         return CodedValueType{"EventID", "110103", "DICOM Instances Accessed"};
+    case CodeType::InstancesTransferred:
+        return CodedValueType{"EventID", "110104", "DICOM Instances Transferred"};
     case CodeType::PatientId:
         return CodedValueType{"ParticipantObjectIDTypeCode", "2"};
     case CodeType::Source:

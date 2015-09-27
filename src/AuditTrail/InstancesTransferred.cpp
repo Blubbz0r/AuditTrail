@@ -13,6 +13,11 @@ InstancesTransferred::InstancesTransferred(Outcome outcome, Action action)
 std::vector<IO::Node> InstancesTransferred::createNodes() const
 {
     std::vector<IO::Node> nodes;
+
+    EntityEvent event(m_outcome, actionToActionCode(),
+                      generateCode(CodeType::InstancesTransferred));
+    nodes.emplace_back(event.toNode());
+
     return nodes;
 }
 
