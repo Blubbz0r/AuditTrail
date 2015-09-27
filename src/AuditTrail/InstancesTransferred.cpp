@@ -1,5 +1,6 @@
 #include "InstancesTransferred.h"
 
+#include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
 
 namespace AuditTrail
@@ -9,6 +10,7 @@ InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
                                            ActiveParticipant sendingProcess)
     : m_outcome(outcome), m_action(action), m_sendingProcess(sendingProcess)
 {
+    m_sendingProcess.roleIdCode = generateCode(CodeType::Source);
 }
 
 std::vector<IO::Node> InstancesTransferred::createNodes() const
@@ -18,6 +20,7 @@ std::vector<IO::Node> InstancesTransferred::createNodes() const
     EntityEvent event(m_outcome, actionToActionCode(),
                       generateCode(CodeType::InstancesTransferred));
     nodes.emplace_back(event.toNode());
+    nodes.emplace_back(EntityActiveParticipant(m_sendingProcess).toNode());
 
     return nodes;
 }
