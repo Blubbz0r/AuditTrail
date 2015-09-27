@@ -4,11 +4,14 @@
 
 #include "ActiveParticipant.h"
 #include "Event.h"
+#include "SOPClass.h"
 
 #include <memory>
 
 namespace AuditTrail
 {
+
+struct EntityParticipantObject;
 
 /*!
     \brief  Describes the event of deletion of one or more studies and all associated SOP instances
@@ -18,16 +21,20 @@ class StudyDeleted : public Message
 {
 public:
     StudyDeleted(Outcome outcome);
+    ~StudyDeleted();
 
     std::vector<IO::Node> createNodes() const override;
 
     void setDeletingPerson(ActiveParticipant deletingPerson);
     void setDeletingProcess(ActiveParticipant deletingProcess);
 
+    void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+
 private:
     Outcome m_outcome;
     std::unique_ptr<ActiveParticipant> m_deletingPerson;
     std::unique_ptr<ActiveParticipant> m_deletingProcess;
+    std::vector<EntityParticipantObject> m_studies;
 };
 
 }

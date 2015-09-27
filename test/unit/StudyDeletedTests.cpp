@@ -15,6 +15,10 @@ public:
     void checkEventId(const Node& eventId);
 
     void checkDeletingPerson(const Node& deletingPerson);
+
+    void checkStudy(const Node& study);
+    void checkStudyIdTypeCode(const Node& idTypeCode);
+    void checkDescription(const Node& description);
 };
 
 TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -22,9 +26,13 @@ TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     StudyDeleted studyDeleted(Outcome::MinorFailure);
     studyDeleted.setDeletingPerson(ActiveParticipant(User::ArbitraryUserID, true));
 
+    std::vector<SOPClass> sopClasses;
+    sopClasses.emplace_back(SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
+    studyDeleted.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
+
     auto nodes = studyDeleted.createNodes();
 
-    ASSERT_THAT(nodes.size(), Eq(2));
+    ASSERT_THAT(nodes.size(), Eq(3));
 
     auto node = nodes[0];
     ASSERT_THAT(node.name(), Eq("EventIdentification"));
@@ -33,6 +41,10 @@ TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkDeletingPerson(node);
+
+    node = nodes[2];
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
+    checkStudy(node);
 }
 
 void StudyDeletedTests::checkEventIdentification(const Node& eventIdentification)
@@ -88,4 +100,67 @@ void StudyDeletedTests::checkDeletingPerson(const Node& deletingPerson)
     EXPECT_THAT(attribute.value, Eq("true"));
 
     ASSERT_THAT(deletingPerson.nodes().size(), Eq(0));
+}
+
+void StudyDeletedTests::checkStudy(const Node& study)
+{
+    ASSERT_THAT(study.attributes().size(), Eq(3));
+
+    auto attribute = study.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryStudyInstanceUID));
+
+    attribute = study.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
+    EXPECT_THAT(attribute.value, Eq("2"));
+
+    attribute = study.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCodeRole"));
+    EXPECT_THAT(attribute.value, Eq("3"));
+
+    ASSERT_THAT(study.nodes().size(), Eq(2));
+
+    auto node = study.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
+    checkStudyIdTypeCode(node);
+
+    node = study.nodes().at(1);
+    ASSERT_THAT(node.name(), Eq("ParticipantObjectDescription"));
+    checkDescription(node);
+}
+
+void StudyDeletedTests::checkStudyIdTypeCode(const Node& idTypeCode)
+{
+    ASSERT_THAT(idTypeCode.attributes().size(), Eq(3));
+
+    auto attribute = idTypeCode.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("code"));
+    EXPECT_THAT(attribute.value, Eq("110180"));
+
+    attribute = idTypeCode.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
+    EXPECT_THAT(attribute.value, Eq("DCM"));
+
+    attribute = idTypeCode.attributes().at(2);
+    ASSERT_THAT(attribute.name, Eq("displayName"));
+    EXPECT_THAT(attribute.value, Eq("Study Instance UID"));
+}
+
+void StudyDeletedTests::checkDescription(const Node& description)
+{
+    ASSERT_THAT(description.attributes().size(), Eq(0));
+
+    ASSERT_THAT(description.nodes().size(), Eq(1));
+
+    auto node = description.nodes().at(0);
+    ASSERT_THAT(node.name(), Eq("SOPClass"));
+
+    ASSERT_THAT(node.attributes().size(), Eq(2));
+    auto attribute = node.attributes().at(0);
+    ASSERT_THAT(attribute.name, Eq("UID"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitrarySOPClassUID));
+
+    attribute = node.attributes().at(1);
+    ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
 }

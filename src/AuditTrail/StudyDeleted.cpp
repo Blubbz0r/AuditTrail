@@ -2,12 +2,17 @@
 
 #include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
 
 StudyDeleted::StudyDeleted(Outcome outcome)
     : m_outcome(outcome), m_deletingPerson(nullptr), m_deletingProcess(nullptr)
+{
+}
+
+StudyDeleted::~StudyDeleted()
 {
 }
 
@@ -36,6 +41,11 @@ void StudyDeleted::setDeletingPerson(ActiveParticipant deletingPerson)
 void StudyDeleted::setDeletingProcess(ActiveParticipant deletingProcess)
 {
     m_deletingProcess = std::make_unique<ActiveParticipant>(deletingProcess);
+}
+
+void StudyDeleted::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
+{
+
 }
 
 }
