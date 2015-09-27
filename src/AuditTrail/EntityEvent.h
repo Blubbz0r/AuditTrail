@@ -2,6 +2,7 @@
 
 #include "Entity.h"
 #include "CodedValueType.h"
+#include "Event.h"
 
 namespace AuditTrail
 {
@@ -16,14 +17,6 @@ enum class EventActionCode
 };
 
 std::string eventActionCodeToString(EventActionCode code);
-
-enum class Outcome
-{
-    Success = 0,
-    MinorFailure = 4,
-    SeriousFailure = 8,
-    MajorFailure = 12
-};
 
 struct EntityEvent : public Entity
 {

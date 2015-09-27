@@ -3,8 +3,8 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
-#include "EntityEvent.h"
 #include "EntityParticipantObject.h"
+#include "Event.h"
 #include "Media.h"
 
 namespace AuditTrail
@@ -22,14 +22,12 @@ namespace AuditTrail
 class DataImport : public Message
 {
 public:
-    DataImport(Outcome outcome, MediaType sourceMedia);
+    DataImport(Outcome outcome, Media sourceMedia);
 
     std::vector<IO::Node> createNodes() const override;
 
     void addImportingUser(ActiveParticipant importingUser);
     void addImportingProcess(ActiveParticipant importingProcess);
-
-    void setMediaLabel(std::string mediaLabel) { m_mediaLabel = std::move(mediaLabel); }
 
     void addSource(ActiveParticipant source);
 
@@ -41,8 +39,7 @@ private:
     Outcome m_outcome;
     std::vector<ActiveParticipant> m_importingUsers;
     std::vector<ActiveParticipant> m_importingProcesses;
-    MediaType m_sourceMedia;
-    std::string m_mediaLabel;
+    Media m_sourceMedia;
     std::vector<ActiveParticipant> m_sources;
     std::vector<EntityParticipantObject> m_studies;
     std::vector<std::pair<std::string, std::string>> m_patients;

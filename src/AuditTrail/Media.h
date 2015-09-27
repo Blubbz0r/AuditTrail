@@ -21,4 +21,20 @@ static std::string mediaTypeToString(MediaType mediaType)
     }
 }
 
+struct Media
+{
+    Media(MediaType type) : mediaType(type) {}
+
+    MediaType mediaType;
+    std::string mediaLabel;
+
+    std::string mediaId() const
+    {
+        std::string id = mediaTypeToString(mediaType);
+        if (!mediaLabel.empty())
+            id += " " + mediaLabel;
+        return id;
+    }
+};
+
 }

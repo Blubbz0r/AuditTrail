@@ -1,11 +1,12 @@
 #include "DataImport.h"
 
 #include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 
 namespace AuditTrail
 {
 
-DataImport::DataImport(Outcome outcome, MediaType sourceMedia)
+DataImport::DataImport(Outcome outcome, Media sourceMedia)
     : m_outcome(outcome), m_sourceMedia(sourceMedia)
 {
 }
@@ -23,11 +24,7 @@ std::vector<IO::Node> DataImport::createNodes() const
     for (const auto& importingProcess : m_importingProcesses)
         nodes.emplace_back(EntityActiveParticipant(importingProcess).toNode());
 
-    std::string mediaId = mediaTypeToString(m_sourceMedia);
-    if (!m_mediaLabel.empty())
-        mediaId += " " + m_mediaLabel;
-
-    ActiveParticipant sourceMedia(mediaId, false);
+    ActiveParticipant sourceMedia(m_sourceMedia.mediaId(), false);
     sourceMedia.roleIdCode = generateCode(CodeType::SourceMedia);
     nodes.emplace_back(EntityActiveParticipant(sourceMedia).toNode());
 
