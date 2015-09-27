@@ -1,9 +1,11 @@
 #include "gmock/gmock.h"
 
 #include "AuditLogUsed.h"
+#include "TestData.h"
 
 using namespace AuditTrail;
 using namespace IO;
+using namespace Tests;
 using namespace testing;
 
 class AuditLogUsedTests : public Test
@@ -25,18 +27,18 @@ TEST_F(AuditLogUsedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     AuditLogUsed auditLogUsed(Outcome::MinorFailure,
                               "file:///C:/ProgramData/iQ-ROBOT/AuditLog/log.xml");
 
-    ActiveParticipant accessingApplication("111", true);
-    accessingApplication.addAETitle("ARCHIVE");
-    accessingApplication.userName = "ARCHIVE";
+    ActiveParticipant accessingApplication(Process::ArbitraryProcessID, true);
+    accessingApplication.addAETitle(DICOM::ArbitraryAETitle);
+    accessingApplication.userName = Process::ArbitraryProcessName;
     accessingApplication.networkAccessPointType = NetworkAccessPointType::MachineName;
     accessingApplication.networkAccessPointId = "CT001";
     auditLogUsed.setAccessingApplication(accessingApplication);
 
-    ActiveParticipant accessingUser("john.doe@gmail.com", true);
+    ActiveParticipant accessingUser(User::ArbitraryUserID, true);
     accessingUser.setAlternativeUserId("MS\\doe");
-    accessingUser.userName = "John Doe";
+    accessingUser.userName = User::ArbitraryUserName;
     accessingUser.networkAccessPointType = NetworkAccessPointType::TelephoneNumber;
-    accessingUser.networkAccessPointId = "123456789";
+    accessingUser.networkAccessPointId = User::ArbitraryTelephoneNumber;
     auditLogUsed.setAccessingUser(accessingUser);
 
     auto nodes = auditLogUsed.createNodes();
@@ -106,15 +108,15 @@ void AuditLogUsedTests::checkActiveParticipantApplication(const Node& activePart
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("111"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= ARCHIVE"));
+    EXPECT_THAT(attribute.value, Eq("AETITLES= " + DICOM::ArbitraryAETitle));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("ARCHIVE"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessName));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -135,7 +137,7 @@ void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
@@ -143,7 +145,7 @@ void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("John Doe"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserName));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -155,7 +157,7 @@ void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("123456789"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryTelephoneNumber));
 }
 
 void AuditLogUsedTests::checkParticipantObject(const Node& participantObject)
