@@ -21,6 +21,7 @@ public:
 TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes)
 {
     InstancesAccessed instancesAccessed(Outcome::Success, InstancesAccessed::Action::Delete);
+    instancesAccessed.setManipulatingPerson(ActiveParticipant(User::ArbitraryUserID, false));
 
     auto nodes = instancesAccessed.createNodes();
 

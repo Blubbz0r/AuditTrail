@@ -1,5 +1,6 @@
 #include "InstancesAccessed.h"
 
+#include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
 
 namespace AuditTrail
@@ -19,6 +20,12 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
 
     EntityEvent event(m_outcome, actionToActionCode(), generateCode(CodeType::InstancesAccessed));
     nodes.emplace_back(event.toNode());
+
+    if (m_manipulatingPerson)
+        nodes.emplace_back(EntityActiveParticipant(*m_manipulatingPerson).toNode());
+
+    if (m_manipulatingProcess)
+        nodes.emplace_back(EntityActiveParticipant(*m_manipulatingProcess).toNode());
 
     return nodes;
 }
