@@ -1,9 +1,11 @@
 #include "gmock/gmock.h"
 
 #include "DataImport.h"
+#include "TestData.h"
 
 using namespace AuditTrail;
 using namespace IO;
+using namespace Tests;
 using namespace testing;
 
 class DataImportTests : public Test
@@ -32,14 +34,14 @@ public:
 TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     DataImport dataImport(Outcome::MinorFailure, MediaType::CD);
-    dataImport.addImportingUser(ActiveParticipant("john.doe@gmail.com", true));
-    dataImport.addSource(ActiveParticipant("john.doe@gmail.com", false));
+    dataImport.addImportingUser(ActiveParticipant(User::ArbitraryUserID, true));
+    dataImport.addSource(ActiveParticipant(User::ArbitraryUserID, false));
 
     std::vector<SOPClass> sopClasses;
-    sopClasses.emplace_back(SOPClass{"1.2.840.10008.5.1.4.1.1.2", 1000});
-    dataImport.addStudy("1.2.2.55.555.84984456465", sopClasses);
+    sopClasses.emplace_back(SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
+    dataImport.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
-    dataImport.addPatient("ID123", "Sandra Newman");
+    dataImport.addPatient(DICOM::ArbitraryPatientID, DICOM::ArbitraryPatientName);
 
     auto nodes = dataImport.createNodes();
 
@@ -116,7 +118,7 @@ void DataImportTests::checkImportingUser(const Node& importingUser)
 
     auto attribute = importingUser.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = importingUser.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -188,7 +190,7 @@ void DataImportTests::checkSource(const Node& source)
 
     auto attribute = source.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = source.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -224,7 +226,7 @@ void DataImportTests::checkStudy(const Node& study)
 
     auto attribute = study.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.2.55.555.84984456465"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryStudyInstanceUID));
 
     attribute = study.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -273,11 +275,11 @@ void DataImportTests::checkDescription(const Node& description)
     ASSERT_THAT(node.attributes().size(), Eq(2));
     auto attribute = node.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.840.10008.5.1.4.1.1.2"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitrarySOPClassUID));
 
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
-    EXPECT_THAT(attribute.value, Eq("1000"));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
 }
 
 void DataImportTests::checkPatient(const Node& patient)
@@ -286,7 +288,7 @@ void DataImportTests::checkPatient(const Node& patient)
 
     auto attribute = patient.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("ID123"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryPatientID));
 
     attribute = patient.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -303,7 +305,7 @@ void DataImportTests::checkPatient(const Node& patient)
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
-    ASSERT_THAT(node.value(), Eq("Sandra Newman"));
+    ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
 }
 
 void DataImportTests::checkPatientIDTypeCode(const Node& idTypeCode)

@@ -21,6 +21,15 @@ namespace DICOM
 
 }
 
+namespace Machine
+{
+
+    const std::string ArbitraryMachineName = "CT001";
+
+    const std::string ArbitraryIPAddress = "127.0.0.1";
+
+}
+
 namespace Process
 {
 
@@ -28,14 +37,14 @@ namespace Process
 
     const std::string ArbitraryProcessName = "Archive";
 
-    const std::string ArbitraryIPAddress = "127.0.0.1";
-
 }
 
 namespace User
 {
 
     const std::string ArbitraryUserID = "john.doe@gmail.com";
+
+    const std::string ArbitraryAlternativeUserID = "MS\\doe";
 
     const std::string ArbitraryUserName = "John Doe";
 

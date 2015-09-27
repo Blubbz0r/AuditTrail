@@ -31,11 +31,11 @@ TEST_F(AuditLogUsedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     accessingApplication.addAETitle(DICOM::ArbitraryAETitle);
     accessingApplication.userName = Process::ArbitraryProcessName;
     accessingApplication.networkAccessPointType = NetworkAccessPointType::MachineName;
-    accessingApplication.networkAccessPointId = "CT001";
+    accessingApplication.networkAccessPointId = Machine::ArbitraryMachineName;
     auditLogUsed.setAccessingApplication(accessingApplication);
 
     ActiveParticipant accessingUser(User::ArbitraryUserID, true);
-    accessingUser.setAlternativeUserId("MS\\doe");
+    accessingUser.setAlternativeUserId(User::ArbitraryAlternativeUserID);
     accessingUser.userName = User::ArbitraryUserName;
     accessingUser.networkAccessPointType = NetworkAccessPointType::TelephoneNumber;
     accessingUser.networkAccessPointId = User::ArbitraryTelephoneNumber;
@@ -128,7 +128,7 @@ void AuditLogUsedTests::checkActiveParticipantApplication(const Node& activePart
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("CT001"));
+    EXPECT_THAT(attribute.value, Eq(Machine::ArbitraryMachineName));
 }
 
 void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant)
@@ -141,7 +141,7 @@ void AuditLogUsedTests::checkActiveParticipantUser(const Node& activeParticipant
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("MS\\doe"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryAlternativeUserID));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));

@@ -1,9 +1,11 @@
 #include "gmock/gmock.h"
 
 #include "DataExport.h"
+#include "TestData.h"
 
 using namespace AuditTrail;
 using namespace IO;
+using namespace Tests;
 using namespace testing;
 
 class DataExportTests : public Test
@@ -33,14 +35,14 @@ TEST_F(DataExportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
     DataExport dataExport(Outcome::Success, MediaType::DVD);
 
-    dataExport.addRemoteUser(ActiveParticipant("john.doe@gmail.com", false));
-    dataExport.setExportingUser(ActiveParticipant("john.doe@gmail.com", true));
+    dataExport.addRemoteUser(ActiveParticipant(User::ArbitraryUserID, false));
+    dataExport.setExportingUser(ActiveParticipant(User::ArbitraryUserID, true));
 
     std::vector<SOPClass> sopClasses;
-    sopClasses.emplace_back(SOPClass{ "1.2.840.10008.5.1.4.1.1.2", 1000 });
-    dataExport.addStudy("1.2.2.55.555.84984456465", sopClasses);
+    sopClasses.emplace_back(SOPClass{ DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
+    dataExport.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
-    dataExport.addPatient("ID123", "Sandra Newman");
+    dataExport.addPatient(DICOM::ArbitraryPatientID, DICOM::ArbitraryPatientName);
 
     auto nodes = dataExport.createNodes();
 
@@ -153,7 +155,7 @@ void DataExportTests::checkExportingUser(const Node& exportingUser)
 
     auto attribute = exportingUser.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = exportingUser.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -225,7 +227,7 @@ void DataExportTests::checkStudy(const Node& study)
 
     auto attribute = study.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.2.55.555.84984456465"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryStudyInstanceUID));
 
     attribute = study.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -274,11 +276,11 @@ void DataExportTests::checkDescription(const Node& description)
     ASSERT_THAT(node.attributes().size(), Eq(2));
     auto attribute = node.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.840.10008.5.1.4.1.1.2"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitrarySOPClassUID));
 
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
-    EXPECT_THAT(attribute.value, Eq("1000"));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
 }
 
 void DataExportTests::checkPatient(const Node& patient)
@@ -287,7 +289,7 @@ void DataExportTests::checkPatient(const Node& patient)
 
     auto attribute = patient.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("ID123"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryPatientID));
 
     attribute = patient.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -304,7 +306,7 @@ void DataExportTests::checkPatient(const Node& patient)
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
-    ASSERT_THAT(node.value(), Eq("Sandra Newman"));
+    ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
 }
 
 void DataExportTests::checkPatientIDTypeCode(const Node& idTypeCode)

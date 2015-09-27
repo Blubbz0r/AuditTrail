@@ -1,9 +1,11 @@
 #include "gmock/gmock.h"
 
 #include "BeginTransferringInstances.h"
+#include "TestData.h"
 
 using namespace AuditTrail;
 using namespace IO;
+using namespace Tests;
 using namespace testing;
 
 class BeginTransferringInstancesTests : public Test
@@ -30,18 +32,18 @@ public:
 
 TEST_F(BeginTransferringInstancesTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
-    BeginTransferringInstances beginTransferringInstances(Outcome::SeriousFailure,
-                                                          ActiveParticipant("123", true),
-                                                          ActiveParticipant("234", false), "ID123");
+    BeginTransferringInstances beginTransferringInstances(
+        Outcome::SeriousFailure, ActiveParticipant(Process::ArbitraryProcessID, true),
+        ActiveParticipant(Process::ArbitraryProcessID, false), DICOM::ArbitraryPatientID);
 
-    ActiveParticipant otherParticipant("john.doe@gmail.com", false);
+    ActiveParticipant otherParticipant(User::ArbitraryUserID, false);
     beginTransferringInstances.addOtherParticipant(otherParticipant);
 
     std::vector<SOPClass> sopClasses;
-    sopClasses.emplace_back(SOPClass{"1.2.840.10008.5.1.4.1.1.2", 1000});
-    beginTransferringInstances.addStudy("1.2.2.55.555.84984456465", sopClasses);
+    sopClasses.emplace_back(SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
+    beginTransferringInstances.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
-    beginTransferringInstances.setPatientName("Sandra Newman");
+    beginTransferringInstances.setPatientName(DICOM::ArbitraryPatientName);
 
     auto nodes = beginTransferringInstances.createNodes();
 
@@ -119,7 +121,7 @@ void BeginTransferringInstancesTests::checkActiveParticipantProcessSendingData(
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("123"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -156,7 +158,7 @@ void BeginTransferringInstancesTests::checkActiveParticipantProcessReceivingData
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("234"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -192,7 +194,7 @@ void BeginTransferringInstancesTests::checkOtherParticipant(const Node& particip
 
     auto attribute = participant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = participant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -205,7 +207,7 @@ void BeginTransferringInstancesTests::checkStudiesBeingTransferred(const Node& s
 
     auto attribute = studies.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.2.55.555.84984456465"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryStudyInstanceUID));
 
     attribute = studies.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -254,11 +256,11 @@ void BeginTransferringInstancesTests::checkDescription(const Node& description)
     ASSERT_THAT(node.attributes().size(), Eq(2));
     auto attribute = node.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.840.10008.5.1.4.1.1.2"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitrarySOPClassUID));
 
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
-    EXPECT_THAT(attribute.value, Eq("1000"));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
 }
 
 void BeginTransferringInstancesTests::checkPatient(const Node& patient)
@@ -267,7 +269,7 @@ void BeginTransferringInstancesTests::checkPatient(const Node& patient)
 
     auto attribute = patient.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("ID123"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryPatientID));
 
     attribute = patient.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -284,7 +286,7 @@ void BeginTransferringInstancesTests::checkPatient(const Node& patient)
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
-    ASSERT_THAT(node.value(), Eq("Sandra Newman"));
+    ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
 }
 
 void BeginTransferringInstancesTests::checkPatientIDTypeCode(const Node& idTypeCode)

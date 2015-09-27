@@ -30,13 +30,13 @@ TEST_F(ApplicationActivityTests, createNodes_WithAllAttributes_ReturnsCorrectNod
     applicationInfo.addAETitle(DICOM::ArbitraryAETitle2);
     applicationInfo.userName = Process::ArbitraryProcessName;
     applicationInfo.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    applicationInfo.networkAccessPointId = Process::ArbitraryIPAddress;
+    applicationInfo.networkAccessPointId = Machine::ArbitraryIPAddress;
 
     ActiveParticipant involvedApplication(Process::ArbitraryProcessID, true);
     involvedApplication.addAETitle(DICOM::ArbitraryAETitle3);
     involvedApplication.userName = Process::ArbitraryProcessName;
     involvedApplication.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    involvedApplication.networkAccessPointId = Process::ArbitraryIPAddress;
+    involvedApplication.networkAccessPointId = Machine::ArbitraryIPAddress;
 
     ActiveParticipant involvedUser(User::ArbitraryUserID, true);
     involvedUser.setAlternativeUserId("MS\\doe");
@@ -154,7 +154,7 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryIPAddress));
+    EXPECT_THAT(attribute.value, Eq(Machine::ArbitraryIPAddress));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
@@ -207,7 +207,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryIPAddress));
+    EXPECT_THAT(attribute.value, Eq(Machine::ArbitraryIPAddress));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
