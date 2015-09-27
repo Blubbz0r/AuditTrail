@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} ActiveParticipant.h ActiveParticipant.cpp
                             Message.h
                             Node.h
                             SOPClass.h
+                            StudyDeleted.h StudyDeleted.cpp
                             Writer.h
                             WriterPugixml.h WriterPugixml.cpp)
 

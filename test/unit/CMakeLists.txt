@@ -17,6 +17,7 @@ add_executable(${CURRENT_PROJECT_NAME}  main.cpp
                                         DataImportTests.cpp
                                         InstancesAccessedTests.cpp
                                         InstancesTransferredTests.cpp
+                                        StudyDeletedTests.cpp
                                         TestData.h
                                         Tests.cpp
                                         WriterMock.h)
