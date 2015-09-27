@@ -35,6 +35,15 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
     for (const auto& study : m_studies)
         nodes.emplace_back(study.toNode());
 
+    for (const auto& patient : m_patients)
+    {
+        EntityParticipantObject patientEntity(EntityParticipantObject::Type::Person,
+                                              EntityParticipantObject::Role::Patient,
+                                              generateCode(CodeType::PatientId), patient.first);
+        patientEntity.objectNameOrQuery = patient.second;
+        nodes.emplace_back(patientEntity.toNode());
+    }
+
     return nodes;
 }
 
@@ -78,7 +87,7 @@ void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPCl
 void InstancesAccessed::addPatient(std::string patientId,
                                    std::string patientName /*= std::string()*/)
 {
-
+    m_patients.emplace_back(std::move(patientId), std::move(patientName));
 }
 
 }
