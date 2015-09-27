@@ -2,6 +2,7 @@
 
 #include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
@@ -16,6 +17,10 @@ InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
 {
     m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
     m_receivingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
+}
+
+InstancesTransferred::~InstancesTransferred()
+{
 }
 
 std::vector<IO::Node> InstancesTransferred::createNodes() const
@@ -52,6 +57,11 @@ EventActionCode InstancesTransferred::actionToActionCode() const
     default:
         throw std::logic_error("Unable to convert action " + std::to_string(static_cast<int>(m_action)) + " to string.");
     }
+}
+
+void InstancesTransferred::addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses)
+{
+
 }
 
 }

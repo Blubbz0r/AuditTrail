@@ -4,10 +4,12 @@
 
 #include "ActiveParticipant.h"
 #include "Event.h"
+#include "SOPClass.h"
 
 namespace AuditTrail
 {
 
+struct EntityParticipantObject;
 enum class EventActionCode;
 
 /*!
@@ -28,10 +30,12 @@ public:
 
     InstancesTransferred(Outcome outcome, Action action, ActiveParticipant sendingProcess,
                          ActiveParticipant receivingProcess);
+    ~InstancesTransferred();
 
     std::vector<IO::Node> createNodes() const override;
 
     void addOtherParticipant(ActiveParticipant otherParticipant);
+    void addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses);
 
 private:
     EventActionCode actionToActionCode() const;
@@ -41,6 +45,7 @@ private:
     ActiveParticipant m_sendingProcess;
     ActiveParticipant m_receivingProcess;
     std::vector<ActiveParticipant> m_otherParticipants;
+    std::vector<EntityParticipantObject> m_studies;
 };
 
 }
