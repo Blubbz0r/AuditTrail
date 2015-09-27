@@ -7,6 +7,8 @@
 namespace AuditTrail
 {
 
+enum class EventActionCode;
+
 class InstancesAccessed : public Message
 {
 public:
@@ -23,6 +25,8 @@ public:
     std::vector<IO::Node> createNodes() const override;
 
 private:
+    EventActionCode actionToActionCode() const;
+
     Outcome m_outcome;
     Action m_action;
 };
