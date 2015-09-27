@@ -14,6 +14,11 @@ namespace AuditTrail
 struct EntityParticipantObject;
 enum class EventActionCode;
 
+/*!
+    \brief  Describes the event of DICOM SOP instances being viewed, utilized, updated or deleted.
+
+    \todo   "If all instances within a study are deleted, then the EV(110105, DCM, "DICOM Study Deleted") event shall be used"
+*/
 class InstancesAccessed : public Message
 {
 public:
