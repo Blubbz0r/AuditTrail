@@ -32,6 +32,9 @@ std::vector<IO::Node> InstancesAccessed::createNodes() const
     if (m_manipulatingProcess)
         nodes.emplace_back(EntityActiveParticipant(*m_manipulatingProcess).toNode());
 
+    for (const auto& study : m_studies)
+        nodes.emplace_back(study.toNode());
+
     return nodes;
 }
 
@@ -64,7 +67,12 @@ void InstancesAccessed::setManipulatingProcess(ActiveParticipant manipulatingPro
 
 void InstancesAccessed::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
 {
+    EntityParticipantObject study(
+        EntityParticipantObject::Type::SystemObject, EntityParticipantObject::Role::Report,
+        generateCode(CodeType::StudyInstanceUid), std::move(studyInstanceUid));
 
+    study.setSOPClasses(std::move(sopClasses));
+    m_studies.emplace_back(std::move(study));
 }
 
 }
