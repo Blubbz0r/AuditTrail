@@ -27,8 +27,9 @@ TEST_F(InstancesAccessedTests, createNodes_WithAllAttributes_CreatesCorrectNodes
     instancesAccessed.setManipulatingPerson(ActiveParticipant(User::ArbitraryUserID, false));
 
     std::vector<SOPClass> sopClasses;
-    sopClasses.emplace_back(SOPClass{"1.2.840.10008.5.1.4.1.1.2", 1000});
-    instancesAccessed.addStudy("1.2.2.55.555.84984456465", sopClasses);
+    sopClasses.emplace_back(
+        SOPClass{DICOM::ArbitrarySOPClassUID, DICOM::ArbitraryNumberOfInstances});
+    instancesAccessed.addStudy(DICOM::ArbitraryStudyInstanceUID, sopClasses);
 
     auto nodes = instancesAccessed.createNodes();
 
@@ -108,7 +109,7 @@ void InstancesAccessedTests::checkStudy(const Node& study)
 
     auto attribute = study.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.2.55.555.84984456465"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitraryStudyInstanceUID));
 
     attribute = study.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("ParticipantObjectTypeCode"));
@@ -157,9 +158,9 @@ void InstancesAccessedTests::checkDescription(const Node& description)
     ASSERT_THAT(node.attributes().size(), Eq(2));
     auto attribute = node.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UID"));
-    EXPECT_THAT(attribute.value, Eq("1.2.840.10008.5.1.4.1.1.2"));
+    EXPECT_THAT(attribute.value, Eq(DICOM::ArbitrarySOPClassUID));
 
     attribute = node.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("NumberOfInstances"));
-    EXPECT_THAT(attribute.value, Eq("1000"));
+    EXPECT_THAT(attribute.value, Eq(std::to_string(DICOM::ArbitraryNumberOfInstances)));
 }

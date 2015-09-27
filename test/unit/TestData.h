@@ -12,6 +12,10 @@ namespace DICOM
     const std::string ArbitraryAETitle2 = "ARCHIVE2";
     const std::string ArbitraryAETitle3 = "VIEWER";
 
+    const std::string ArbitraryStudyInstanceUID = "1.2.840.10008.5.1.4.1.1.2";
+    const std::string ArbitrarySOPClassUID = "1.2.840.10008.5.1.4.1.1.2.123";
+    const int ArbitraryNumberOfInstances = 1000;
+
 }
 
 namespace Process
@@ -20,6 +24,8 @@ namespace Process
     const std::string ArbitraryProcessID = "123";
 
     const std::string ArbitraryProcessName = "Archive";
+
+    const std::string ArbitraryIPAddress = "127.0.0.1";
 
 }
 

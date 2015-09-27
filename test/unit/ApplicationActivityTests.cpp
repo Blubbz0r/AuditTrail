@@ -1,9 +1,11 @@
 #include "gmock/gmock.h"
 
 #include "ApplicationActivity.h"
+#include "TestData.h"
 
 using namespace AuditTrail;
 using namespace IO;
+using namespace Tests;
 using namespace testing;
 
 class ApplicationActivityTests : public Test
@@ -23,24 +25,24 @@ public:
 
 TEST_F(ApplicationActivityTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 {
-    ActiveParticipant applicationInfo("123", false);
-    applicationInfo.addAETitle("ARCHIVE1");
-    applicationInfo.addAETitle("ARCHIVE2");
-    applicationInfo.userName = "ARCHIVE";
+    ActiveParticipant applicationInfo(Process::ArbitraryProcessID, false);
+    applicationInfo.addAETitle(DICOM::ArbitraryAETitle);
+    applicationInfo.addAETitle(DICOM::ArbitraryAETitle2);
+    applicationInfo.userName = Process::ArbitraryProcessName;
     applicationInfo.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    applicationInfo.networkAccessPointId = "127.0.0.1";
+    applicationInfo.networkAccessPointId = Process::ArbitraryIPAddress;
 
-    ActiveParticipant involvedApplication("234", true);
-    involvedApplication.addAETitle("VIEWER");
-    involvedApplication.userName = "VIEWER";
+    ActiveParticipant involvedApplication(Process::ArbitraryProcessID, true);
+    involvedApplication.addAETitle(DICOM::ArbitraryAETitle3);
+    involvedApplication.userName = Process::ArbitraryProcessName;
     involvedApplication.networkAccessPointType = NetworkAccessPointType::IPAddress;
-    involvedApplication.networkAccessPointId = "127.0.0.1";
+    involvedApplication.networkAccessPointId = Process::ArbitraryIPAddress;
 
-    ActiveParticipant involvedUser("john.doe@gmail.com", true);
+    ActiveParticipant involvedUser(User::ArbitraryUserID, true);
     involvedUser.setAlternativeUserId("MS\\doe");
-    involvedUser.userName = "John Doe";
+    involvedUser.userName = User::ArbitraryUserName;
     involvedUser.networkAccessPointType = NetworkAccessPointType::TelephoneNumber;
-    involvedUser.networkAccessPointId = "123456789";
+    involvedUser.networkAccessPointId = User::ArbitraryTelephoneNumber;
 
     ApplicationActivity activity(ApplicationEvent::Stopped, Outcome::MajorFailure, applicationInfo);
 
@@ -131,15 +133,16 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("123"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= ARCHIVE1;ARCHIVE2"));
+    EXPECT_THAT(attribute.value,
+                Eq("AETITLES= " + DICOM::ArbitraryAETitle + ";" + DICOM::ArbitraryAETitle2));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("ARCHIVE"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessName));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -151,7 +154,7 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("127.0.0.1"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryIPAddress));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
@@ -184,15 +187,15 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("234"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
-    EXPECT_THAT(attribute.value, Eq("AETITLES= VIEWER"));
+    EXPECT_THAT(attribute.value, Eq("AETITLES= " + DICOM::ArbitraryAETitle3));
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("VIEWER"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryProcessName));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -204,7 +207,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("127.0.0.1"));
+    EXPECT_THAT(attribute.value, Eq(Process::ArbitraryIPAddress));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
@@ -219,7 +222,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& ac
 
     auto attribute = activeParticipant.attributes().at(0);
     ASSERT_THAT(attribute.name, Eq("UserID"));
-    EXPECT_THAT(attribute.value, Eq("john.doe@gmail.com"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserID));
 
     attribute = activeParticipant.attributes().at(1);
     ASSERT_THAT(attribute.name, Eq("AlternativeUserID"));
@@ -227,7 +230,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& ac
 
     attribute = activeParticipant.attributes().at(2);
     ASSERT_THAT(attribute.name, Eq("UserName"));
-    EXPECT_THAT(attribute.value, Eq("John Doe"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryUserName));
 
     attribute = activeParticipant.attributes().at(3);
     ASSERT_THAT(attribute.name, Eq("UserIsRequestor"));
@@ -239,7 +242,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& ac
 
     attribute = activeParticipant.attributes().at(5);
     ASSERT_THAT(attribute.name, Eq("NetworkAccessPointID"));
-    EXPECT_THAT(attribute.value, Eq("123456789"));
+    EXPECT_THAT(attribute.value, Eq(User::ArbitraryTelephoneNumber));
 
     ASSERT_THAT(activeParticipant.nodes().size(), Eq(1));
 
