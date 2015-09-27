@@ -36,6 +36,13 @@ std::vector<IO::Node> StudyDeleted::createNodes() const
     for (const auto& study : m_studies)
         nodes.emplace_back(EntityParticipantObject(study).toNode());
 
+    EntityParticipantObject patient(
+        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), m_patientID);
+
+    patient.objectNameOrQuery = m_patientName;
+    nodes.emplace_back(patient.toNode());
+
     return nodes;
 }
 
