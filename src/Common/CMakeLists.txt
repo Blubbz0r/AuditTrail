@@ -15,3 +15,5 @@ target_include_directories(
     PUBLIC
         ${PROJECT_SOURCE_DIR}
 )
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "libs")

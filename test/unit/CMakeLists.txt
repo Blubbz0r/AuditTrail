@@ -35,3 +35,5 @@ target_link_libraries(
     Common
     ${CONAN_LIBS}
 )
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "tests")

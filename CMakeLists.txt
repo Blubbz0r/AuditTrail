@@ -14,5 +14,7 @@ CONAN_BASIC_SETUP()
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 add_subdirectory(src)
 add_subdirectory(test)

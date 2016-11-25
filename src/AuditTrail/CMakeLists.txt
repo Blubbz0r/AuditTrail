@@ -38,3 +38,4 @@ target_include_directories(
         $<TARGET_PROPERTY:Common,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
+set_property(TARGET ${PROJECT_NAME} PROPERTY FOLDER "libs")
