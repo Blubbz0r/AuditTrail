@@ -1,5 +1,6 @@
 [requires]
 googlemock/1.7.0@Blubbz0r/stable
+pugixml/1.7@sl/ci
 
 [generators]
 cmake

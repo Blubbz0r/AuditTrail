@@ -20,9 +20,5 @@ set(dependency_directory ${PROJECT_SOURCE_DIR}/thirdParty)
 # Add logging
 set(LOG_DIR ${dependency_directory}/easylogging/9.80)
 
-# Add xml parser
-set(XML_DIR ${dependency_directory}/pugixml/1.6)
-set(XML_SOURCE_DIR ${XML_DIR}/src)
-
 add_subdirectory(src)
 add_subdirectory(test)
