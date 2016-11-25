@@ -14,11 +14,5 @@ CONAN_BASIC_SETUP()
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
-# dependency root directory
-set(dependency_directory ${PROJECT_SOURCE_DIR}/thirdParty)
-
-# Add logging
-set(LOG_DIR ${dependency_directory}/easylogging/9.80)
-
 add_subdirectory(src)
 add_subdirectory(test)

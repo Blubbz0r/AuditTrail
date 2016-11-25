@@ -14,7 +14,4 @@ target_include_directories(
 
     PUBLIC
         ${PROJECT_SOURCE_DIR}
-
-    PRIVATE
-        ${LOG_DIR}
 )

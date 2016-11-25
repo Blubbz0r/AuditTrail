@@ -36,6 +36,5 @@ target_include_directories(
 
     PRIVATE
         $<TARGET_PROPERTY:Common,INTERFACE_INCLUDE_DIRECTORIES>
-        ${XML_SOURCE_DIR}
 )
 
