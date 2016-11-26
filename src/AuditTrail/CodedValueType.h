@@ -37,6 +37,7 @@ enum class EventIDCode
     Import,
     InstancesAccessed,
     InstancesTransferred,
+    NetworkEntry,
     StudyDeleted
 };
 
@@ -45,7 +46,9 @@ CodedValueType generateEventID(EventIDCode eventID);
 enum class EventTypeCode
 {
     ApplicationStart,
-    ApplicationStop
+    ApplicationStop,
+    Attach,
+    Detach
 };
 
 CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode);

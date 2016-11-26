@@ -19,6 +19,7 @@ add_library(
     InstancesTransferred.h InstancesTransferred.cpp
     Media.h
     Message.h
+    NetworkEntry.h NetworkEntry.cpp
     Node.h
     SOPClass.h
     StudyDeleted.h StudyDeleted.cpp

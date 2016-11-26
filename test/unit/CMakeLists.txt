@@ -12,6 +12,7 @@ add_executable(
     DataImportTests.cpp
     InstancesAccessedTests.cpp
     InstancesTransferredTests.cpp
+    NetworkEntryTests.cpp
     StudyDeletedTests.cpp
     TestData.h
     Tests.cpp

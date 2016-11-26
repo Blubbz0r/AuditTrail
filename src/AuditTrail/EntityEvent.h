@@ -32,6 +32,7 @@ private:
     Outcome m_outcome;
     EventActionCode m_eventActionCode;
     CodedValueType m_eventId;
+    std::string m_eventDateTime;
 };
 
 }

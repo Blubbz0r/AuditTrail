@@ -6,7 +6,10 @@ namespace AuditTrail
 {
 
 EntityEvent::EntityEvent(Outcome outcome, EventActionCode eventActionCode, CodedValueType eventId)
-    : m_outcome(outcome), m_eventActionCode(eventActionCode), m_eventId(std::move(eventId))
+    : m_outcome(outcome),
+      m_eventActionCode(eventActionCode),
+      m_eventId(std::move(eventId)),
+      m_eventDateTime(currentDateTime())
 {
 }
 
@@ -15,7 +18,7 @@ IO::Node EntityEvent::toNode() const
     IO::Node eventIdentification("EventIdentification");
     eventIdentification.addAttribute(
         IO::Attribute{"EventActionCode", eventActionCodeToString(m_eventActionCode)});
-    eventIdentification.addAttribute(IO::Attribute{"EventDateTime", currentDateTime()});
+    eventIdentification.addAttribute(IO::Attribute{"EventDateTime", m_eventDateTime});
     eventIdentification.addAttribute(IO::Attribute{
         "EventOutcomeIndicator", std::to_string(static_cast<int>(m_outcome))});
 

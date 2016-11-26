@@ -50,6 +50,8 @@ CodedValueType generateEventID(EventIDCode eventID)
         return CodedValueType{"EventID", "110103", "DICOM Instances Accessed"};
     case EventIDCode::InstancesTransferred:
         return CodedValueType{"EventID", "110104", "DICOM Instances Transferred"};
+    case EventIDCode::NetworkEntry:
+        return CodedValueType{ "EventID", "110108", "Network Entry" };
     case EventIDCode::StudyDeleted:
         return CodedValueType{"EventID", "110105", "DICOM Study Deleted"};
     default:
@@ -65,6 +67,10 @@ CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode)
         return CodedValueType{ "EventTypeCode", "110120", "Application Start" };
     case EventTypeCode::ApplicationStop:
         return CodedValueType{ "EventTypeCode", "110121", "Application Stop" };
+    case EventTypeCode::Attach:
+        return CodedValueType{ "EventTypeCode", "110124", "Attach" };
+    case EventTypeCode::Detach:
+        return CodedValueType{ "EventTypeCode", "110125", "Detach" };
     default:
         throw std::logic_error("Unable to generate event type code from " + std::to_string(static_cast<int>(eventTypeCode)));
     }
