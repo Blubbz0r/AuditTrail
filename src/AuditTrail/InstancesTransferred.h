@@ -2,25 +2,23 @@
 
 #include "Message.h"
 
-#include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "SOPClass.h"
 
 namespace AuditTrail
 {
 
-struct EntityParticipantObject;
-enum class EventActionCode;
-
 /*!
-    \brief  Describes the event of the completion of transferring DICOM SOP instances between two
-            application entities.
+    Describes the event of the completion of transferring DICOM SOP instances between two
+    application entities.
 
     \todo   EventDateTime "Shall be the time when the transfer has completed"
 */
-class InstancesTransferred : public Message
+struct InstancesTransferred : public Message
 {
-public:
     enum class Action
     {
         Create, /*! If the receiver did not hold copies of the instances transferred. If the audit source is either not the receiver, or otherwise does not know whether or not the instances previously were held by the receiving node. */
@@ -34,23 +32,23 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
+    EntityEvent event;
+    EntityActiveParticipant sendingProcess;
+    EntityActiveParticipant receivingProcess;
+    EntityParticipantObject patient;
+
     void addOtherParticipant(ActiveParticipant otherParticipant);
+    std::vector<EntityActiveParticipant> otherParticipants;
 
     void addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses);
+    std::vector<EntityParticipantObject> studies;
 
-    void setPatientName(std::string patientName) { m_patientName = std::move(patientName); }
+    void setPatientName(std::string patientName);
 
 private:
-    EventActionCode actionToActionCode() const;
-
-    Outcome m_outcome;
-    Action m_action;
-    ActiveParticipant m_sendingProcess;
-    ActiveParticipant m_receivingProcess;
-    std::vector<ActiveParticipant> m_otherParticipants;
-    std::vector<EntityParticipantObject> m_studies;
-    std::string m_patientId;
-    std::string m_patientName;
+    static EventActionCode toActionCode(Action action);
+    static ActiveParticipant senderWithRoleIdCode(ActiveParticipant sender);
+    static ActiveParticipant receiverWithRoleIdCode(ActiveParticipant receiver);
 };
 
 }
