@@ -21,6 +21,7 @@ add_library(
     Message.h
     NetworkEntry.h NetworkEntry.cpp
     Node.h
+    Query.h Query.cpp
     SOPClass.h
     StudyDeleted.h StudyDeleted.cpp
     Writer.h

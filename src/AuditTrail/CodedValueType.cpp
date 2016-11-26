@@ -52,6 +52,8 @@ CodedValueType generateEventID(EventIDCode eventID)
         return CodedValueType{"EventID", "110104", "DICOM Instances Transferred"};
     case EventIDCode::NetworkEntry:
         return CodedValueType{ "EventID", "110108", "Network Entry" };
+    case EventIDCode::Query:
+        return CodedValueType{ "EventID", "110112", "Query" };
     case EventIDCode::StudyDeleted:
         return CodedValueType{"EventID", "110105", "DICOM Study Deleted"};
     default:
@@ -82,6 +84,8 @@ CodedValueType generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode i
     {
     case ParticipantObjectIDTypeCode::PatientId:
         return CodedValueType{ "ParticipantObjectIDTypeCode", "2" };
+    case ParticipantObjectIDTypeCode::SOPClassUID:
+        return CodedValueType{ "ParticipantObjectIDTypeCode", "110181", "SOP Class UID" };
     case ParticipantObjectIDTypeCode::StudyInstanceUid:
         return CodedValueType{ "ParticipantObjectIDTypeCode", "110180", "Study Instance UID" };
     case ParticipantObjectIDTypeCode::URI:
