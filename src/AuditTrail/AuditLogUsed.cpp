@@ -1,51 +1,45 @@
 #include "AuditLogUsed.h"
 
-#include "EntityActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
-
 namespace AuditTrail
 {
 
 AuditLogUsed::AuditLogUsed(Outcome outcome, std::string auditLogUri)
-    : m_outcome(outcome),
-      m_accessingApplication(nullptr),
-      m_accessingUser(nullptr),
-      m_auditLogUri(std::move(auditLogUri))
+    : event(outcome, EventActionCode::Read, generateEventID(EventIDCode::AuditLogUsed)),
+      auditLog(EntityParticipantObject::Type::SystemObject,
+               EntityParticipantObject::Role::SecurityResource,
+               generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::URI),
+               std::move(auditLogUri)),
+      accessingApplication(nullptr),
+      accessingUser(nullptr)
 {
+    auditLog.objectNameOrQuery = "Security Audit Log";
 }
 
 std::vector<IO::Node> AuditLogUsed::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Read, generateEventID(EventIDCode::AuditLogUsed));
     nodes.emplace_back(event.toNode());
 
-    if (m_accessingApplication)
-        nodes.emplace_back(EntityActiveParticipant(*m_accessingApplication).toNode());
-    if (m_accessingUser)
-        nodes.emplace_back(EntityActiveParticipant(*m_accessingUser).toNode());
+    if (accessingApplication)
+        nodes.emplace_back(accessingApplication->toNode());
 
-    EntityParticipantObject auditLog(
-        EntityParticipantObject::Type::SystemObject,
-        EntityParticipantObject::Role::SecurityResource,
-        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::URI), m_auditLogUri);
-    auditLog.objectNameOrQuery = "Security Audit Log";
+    if (accessingUser)
+        nodes.emplace_back(accessingUser->toNode());
 
     nodes.emplace_back(auditLog.toNode());
 
     return nodes;
 }
 
-void AuditLogUsed::setAccessingApplication(ActiveParticipant accessingApplication)
+void AuditLogUsed::setAccessingApplication(ActiveParticipant app)
 {
-    m_accessingApplication = std::make_unique<ActiveParticipant>(accessingApplication);
+    accessingApplication = std::make_unique<EntityActiveParticipant>(std::move(app));
 }
 
-void AuditLogUsed::setAccessingUser(ActiveParticipant accessingUser)
+void AuditLogUsed::setAccessingUser(ActiveParticipant user)
 {
-    m_accessingUser = std::make_unique<ActiveParticipant>(accessingUser);
+    accessingUser = std::make_unique<EntityActiveParticipant>(std::move(user));
 }
 
 }
