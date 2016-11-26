@@ -3,6 +3,8 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityActiveParticipant.h"
 #include "Event.h"
 
 namespace AuditTrail
@@ -14,27 +16,25 @@ enum class ApplicationEvent
     Stopped
 };
 
-/*!
-    \brief Describes the event of an application entity starting or stopping.
-*/
-class ApplicationActivity : public Message
+/*! Describes the event of an application entity starting or stopping. */
+struct ApplicationActivity : public Message
 {
-public:
-    ApplicationActivity(ApplicationEvent event, Outcome outcome,
-                        ActiveParticipant applicationInfo);
+    ApplicationActivity(ApplicationEvent applicationEvent, Outcome outcome,
+                        ActiveParticipant appInfo);
 
     std::vector<IO::Node> createNodes() const override;
 
+    EntityEvent event;
+    EntityActiveParticipant applicationInfo;
+
     void addInvolvedApplication(ActiveParticipant applicationInfo);
+    std::vector<EntityActiveParticipant> involvedApplications;
+
     void addInvolvedUser(ActiveParticipant userInfo);
+    std::vector<EntityActiveParticipant> involvedUsers;
 
 private:
-    ApplicationEvent m_event;
-    Outcome m_outcome;
-    ActiveParticipant m_applicationInfo;
-    std::vector<ActiveParticipant> m_involvedApplications;
-    std::vector<ActiveParticipant> m_involvedUsers;
-
+    static ActiveParticipant applicationInfoWithRoleIdCode(ActiveParticipant appInfo);
 };
 
 }
