@@ -22,6 +22,7 @@ add_library(
     NetworkEntry.h NetworkEntry.cpp
     Node.h
     Query.h Query.cpp
+    SecurityAlert.h SecurityAlert.cpp
     SOPClass.h
     StudyDeleted.h StudyDeleted.cpp
     Writer.h

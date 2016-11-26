@@ -39,6 +39,7 @@ enum class EventIDCode
     InstancesTransferred,
     NetworkEntry,
     Query,
+    SecurityAlert,
     StudyDeleted
 };
 
@@ -56,6 +57,7 @@ CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode);
 
 enum class ParticipantObjectIDTypeCode
 {
+    NodeIdentifier,
     PatientId,
     SOPClassUID,
     StudyInstanceUid,

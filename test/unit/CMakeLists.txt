@@ -14,6 +14,7 @@ add_executable(
     InstancesTransferredTests.cpp
     NetworkEntryTests.cpp
     QueryTests.cpp
+    SecurityAlertTests.cpp
     StudyDeletedTests.cpp
     TestData.h
     Tests.cpp

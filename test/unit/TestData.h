@@ -21,6 +21,13 @@ namespace DICOM
 
 }
 
+namespace Filesystem
+{
+
+    const std::string ArbitraryFileURI = "file:///C:/ProgramData/test.txt";
+
+}
+
 namespace Machine
 {
 
