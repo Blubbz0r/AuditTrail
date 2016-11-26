@@ -1,9 +1,13 @@
 #pragma once
 
 #include "Message.h"
-#include "Event.h"
-#include "CodedValueType.h"
 #include "ActiveParticipant.h"
+#include "CodedValueType.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityParticipantObject.h"
+#include "Event.h"
+
 #include <memory>
 
 namespace AuditTrail
@@ -19,9 +23,8 @@ namespace AuditTrail
             result in a successful node authentication. It is expected that in most situations only
             the failures will be reported.
 */
-class SecurityAlert : public Message
+struct SecurityAlert : public Message
 {
-public:
     /*! Types of security alerts defined by DICOM Standard part 16 (CID 403) */
     enum class Type
     {
@@ -54,11 +57,17 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
-    void addReportingPerson(ActiveParticipant reportingPerson);
-    void addReportingProcess(ActiveParticipant reporintProcess);
+    EntityEvent event;
+
+    void addReportingPerson(ActiveParticipant person);
+    std::unique_ptr<EntityActiveParticipant> reportingPerson;
+
+    void addReportingProcess(ActiveParticipant process);
+    std::unique_ptr<EntityActiveParticipant> reportingProcess;
 
     /*! Performing persons or processes */
     void addPerformingParticipant(ActiveParticipant performingParticipant);
+    std::vector<EntityActiveParticipant> performingParticipants;
 
     /*!
         \param  objectId - If \a subject is File: URI of the file or resource.
@@ -66,16 +75,10 @@ public:
                            form ofnode_name@domain_name or as an IP address.
     */
     void addAlertSubject(Subject subject, std::string objectId);
+    std::vector<EntityParticipantObject> alertSubjects;
 
 private:
-    CodedValueType generateEventTypeCode() const;
-
-    Outcome m_outcome;
-    Type m_type;
-    std::unique_ptr<ActiveParticipant> m_reportingPerson;
-    std::unique_ptr<ActiveParticipant> m_reportingProcess;
-    std::vector<ActiveParticipant> m_performingParticipants;
-    std::vector<std::pair<Subject, std::string>> m_alertSubjects;
+    static CodedValueType generateEventTypeCode(Type type);
 };
 
 }
