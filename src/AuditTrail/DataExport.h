@@ -5,6 +5,7 @@
 #include "ActiveParticipant.h"
 #include "EntityActiveParticipant.h"
 #include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "Media.h"
 #include "SOPClass.h"

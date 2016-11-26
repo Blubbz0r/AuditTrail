@@ -8,7 +8,8 @@ namespace AuditTrail
 {
 
 DataImport::DataImport(Outcome outcome, Media sourceMedia)
-    : m_outcome(outcome), m_sourceMedia(sourceMedia)
+    : event(outcome, EventActionCode::Create, generateEventID(EventIDCode::Import)),
+      sourceMedium(mediumWithRoleIdCode(std::move(sourceMedia)))
 {
 }
 
@@ -20,34 +21,24 @@ std::vector<IO::Node> DataImport::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Create, generateEventID(EventIDCode::Import));
     nodes.emplace_back(event.toNode());
 
-    for (const auto& importingUser : m_importingUsers)
+    for (const auto& importingUser : importingUsers)
         nodes.emplace_back(EntityActiveParticipant(importingUser).toNode());
 
-    for (const auto& importingProcess : m_importingProcesses)
+    for (const auto& importingProcess : importingProcesses)
         nodes.emplace_back(EntityActiveParticipant(importingProcess).toNode());
 
-    ActiveParticipant sourceMedia(m_sourceMedia.mediaId(), false);
-    sourceMedia.roleIdCode = generateRoleIDCode(RoleIDCode::SourceMedia);
-    nodes.emplace_back(EntityActiveParticipant(sourceMedia).toNode());
+    nodes.emplace_back(sourceMedium.toNode());
 
-    for (const auto& source : m_sources)
+    for (const auto& source : sources)
         nodes.emplace_back(EntityActiveParticipant(source).toNode());
 
-    for (const auto& study : m_studies)
+    for (const auto& study : studies)
         nodes.emplace_back(study.toNode());
 
-    for (const auto& patient : m_patients)
-    {
-        EntityParticipantObject patientEntity(
-            EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
-            generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
-            patient.first);
-        patientEntity.objectNameOrQuery = patient.second;
-        nodes.emplace_back(patientEntity.toNode());
-    }
+    for (const auto& patient : patients)
+        nodes.emplace_back(patient.toNode());
 
     return nodes;
 }
@@ -55,19 +46,19 @@ std::vector<IO::Node> DataImport::createNodes() const
 void DataImport::addImportingUser(ActiveParticipant importingUser)
 {
     importingUser.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    m_importingUsers.emplace_back(std::move(importingUser));
+    importingUsers.emplace_back(EntityActiveParticipant(std::move(importingUser)));
 }
 
 void DataImport::addImportingProcess(ActiveParticipant importingProcess)
 {
     importingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    m_importingProcesses.emplace_back(std::move(importingProcess));
+    importingProcesses.emplace_back(EntityActiveParticipant(std::move(importingProcess)));
 }
 
 void DataImport::addSource(ActiveParticipant source)
 {
     source.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    m_sources.emplace_back(std::move(source));
+    sources.emplace_back(EntityActiveParticipant(std::move(source)));
 }
 
 void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
@@ -79,12 +70,23 @@ void DataImport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 
     study.setSOPClasses(std::move(sopClasses));
 
-    m_studies.emplace_back(std::move(study));
+    studies.emplace_back(std::move(study));
 }
 
-void DataImport::addPatient(std::string patientId, std::string patientName /*= std::string()*/)
+void DataImport::addPatient(std::string patientId, std::string patientName)
 {
-    m_patients.emplace_back(patientId, patientName);
+    EntityParticipantObject patientEntity(
+        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), patientId);
+    patientEntity.objectNameOrQuery = patientName;
+    patients.emplace_back(std::move(patientEntity));
+}
+
+ActiveParticipant DataImport::mediumWithRoleIdCode(Media media)
+{
+    ActiveParticipant medium(media.mediaId(), false);
+    medium.roleIdCode = generateRoleIDCode(RoleIDCode::SourceMedia);
+    return medium;
 }
 
 }

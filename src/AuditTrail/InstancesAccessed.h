@@ -2,7 +2,9 @@
 
 #include "Message.h"
 
-#include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "SOPClass.h"
 
@@ -11,17 +13,13 @@
 namespace AuditTrail
 {
 
-struct EntityParticipantObject;
-enum class EventActionCode;
-
 /*!
-    \brief  Describes the event of DICOM SOP instances being viewed, utilized, updated or deleted.
+    Describes the event of DICOM SOP instances being viewed, utilized, updated or deleted.
 
     \todo   "If all instances within a study are deleted, then the EV(110105, DCM, "DICOM Study Deleted") event shall be used"
 */
-class InstancesAccessed : public Message
+struct InstancesAccessed : public Message
 {
-public:
     enum class Action
     {
         Create,
@@ -35,23 +33,22 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
-    void setManipulatingPerson(ActiveParticipant manipulatingPerson);
-    void setManipulatingProcess(ActiveParticipant manipulatingProcess);
+    EntityEvent event;
+    EntityParticipantObject patient;
+
+    void setManipulatingPerson(ActiveParticipant person);
+    std::unique_ptr<EntityActiveParticipant> manipulatingPerson;
+
+    void setManipulatingProcess(ActiveParticipant process);
+    std::unique_ptr<EntityActiveParticipant> manipulatingProcess;
 
     void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+    std::vector<EntityParticipantObject> studies;
 
-    void setPatientName(std::string patientName) { m_patientName = std::move(patientName); }
+    void setPatientName(std::string patientName);
 
 private:
-    EventActionCode actionToActionCode() const;
-
-    Outcome m_outcome;
-    Action m_action;
-    std::unique_ptr<ActiveParticipant> m_manipulatingPerson;
-    std::unique_ptr<ActiveParticipant> m_manipulatingProcess;
-    std::vector<EntityParticipantObject> m_studies;
-    std::string m_patientId;
-    std::string m_patientName;
+    static EventActionCode actionToActionCode(Action action);
 };
 
 }
