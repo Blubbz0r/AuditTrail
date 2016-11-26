@@ -3,42 +3,45 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityActiveParticipant.h"
+#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "SOPClass.h"
 
 namespace AuditTrail
 {
 
-struct EntityParticipantObject;
-
 /*!
-    \brief  Describes the event of a system beginning to transfer a set of DICOM instances from one
-            node to another within control of the system's security domain.
+    Describes the event of a system beginning to transfer a set of DICOM instances from one node to
+    another within control of the system's security domain.
 
     \note   This message may only include information about a single patient.
 */
-class BeginTransferringInstances : public Message
+struct BeginTransferringInstances : public Message
 {
-public:
-    BeginTransferringInstances(Outcome outcome, ActiveParticipant sendingProcess,
-                               ActiveParticipant receivingProcess, std::string patientId);
+    BeginTransferringInstances(Outcome outcome, ActiveParticipant sender,
+                               ActiveParticipant receiver, std::string patientId);
     ~BeginTransferringInstances();
 
     std::vector<IO::Node> createNodes() const override;
 
-    void addOtherParticipant(ActiveParticipant otherParticipant);
-    void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+    EntityEvent event;
+    EntityActiveParticipant sendingProcess;
+    EntityActiveParticipant receivingProcess;
+    EntityParticipantObject patient;
 
-    void setPatientName(std::string patientName) { m_patientName = std::move(patientName); }
+    void addOtherParticipant(ActiveParticipant otherParticipant);
+    std::vector<EntityActiveParticipant> otherParticipants;
+
+    void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+    std::vector<EntityParticipantObject> studies;
+
+    void setPatientName(std::string patientName);
 
 private:
-    Outcome m_outcome;
-    ActiveParticipant m_sendingProcess;
-    ActiveParticipant m_receivingProcess;
-    std::vector<ActiveParticipant> m_otherParticipants;
-    std::vector<EntityParticipantObject> m_studies;
-    std::string m_patientId;
-    std::string m_patientName;
+    static ActiveParticipant senderWithRoleIdCode(ActiveParticipant sender);
+    static ActiveParticipant receiverWithRoleIdCode(ActiveParticipant receiver);
 };
 
 }

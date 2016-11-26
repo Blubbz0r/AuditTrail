@@ -1,23 +1,19 @@
 #include "BeginTransferringInstances.h"
 
-#include "EntityActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
-
 namespace AuditTrail
 {
 
-BeginTransferringInstances::BeginTransferringInstances(Outcome outcome,
-                                                       ActiveParticipant sendingProcess,
-                                                       ActiveParticipant receivingProcess,
+BeginTransferringInstances::BeginTransferringInstances(Outcome outcome, ActiveParticipant sender,
+                                                       ActiveParticipant receiver,
                                                        std::string patientId)
-    : m_outcome(outcome),
-      m_sendingProcess(std::move(sendingProcess)),
-      m_receivingProcess(std::move(receivingProcess)),
-      m_patientId(std::move(patientId))
+    : event(outcome, EventActionCode::Execute,
+            generateEventID(EventIDCode::BeginTransferringInstances)),
+      sendingProcess(senderWithRoleIdCode(std::move(sender))),
+      receivingProcess(receiverWithRoleIdCode(std::move(receiver))),
+      patient(EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+              generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
+              std::move(patientId))
 {
-    m_sendingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    m_receivingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
 }
 
 BeginTransferringInstances::~BeginTransferringInstances()
@@ -28,23 +24,16 @@ std::vector<IO::Node> BeginTransferringInstances::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Execute,
-                      generateEventID(EventIDCode::BeginTransferringInstances));
-
     nodes.emplace_back(event.toNode());
-    nodes.emplace_back(EntityActiveParticipant(m_sendingProcess).toNode());
-    nodes.emplace_back(EntityActiveParticipant(m_receivingProcess).toNode());
+    nodes.emplace_back(sendingProcess.toNode());
+    nodes.emplace_back(receivingProcess.toNode());
 
-    for (const auto& otherParticipant : m_otherParticipants)
-        nodes.emplace_back(EntityActiveParticipant(otherParticipant).toNode());
+    for (const auto& otherParticipant : otherParticipants)
+        nodes.emplace_back(otherParticipant.toNode());
 
-    for (const auto& study : m_studies)
+    for (const auto& study : studies)
         nodes.emplace_back(study.toNode());
 
-    EntityParticipantObject patient(
-        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
-        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), m_patientId);
-    patient.objectNameOrQuery = m_patientName;
     nodes.emplace_back(patient.toNode());
 
     return nodes;
@@ -52,7 +41,7 @@ std::vector<IO::Node> BeginTransferringInstances::createNodes() const
 
 void BeginTransferringInstances::addOtherParticipant(ActiveParticipant otherParticipant)
 {
-    m_otherParticipants.emplace_back(std::move(otherParticipant));
+    otherParticipants.emplace_back(EntityActiveParticipant(std::move(otherParticipant)));
 }
 
 void BeginTransferringInstances::addStudy(std::string studyInstanceUid,
@@ -65,7 +54,24 @@ void BeginTransferringInstances::addStudy(std::string studyInstanceUid,
 
     study.setSOPClasses(std::move(sopClasses));
 
-    m_studies.emplace_back(std::move(study));
+    studies.emplace_back(std::move(study));
+}
+
+void BeginTransferringInstances::setPatientName(std::string patientName)
+{
+    patient.objectNameOrQuery = std::move(patientName);
+}
+
+    ActiveParticipant BeginTransferringInstances::senderWithRoleIdCode(ActiveParticipant sender)
+{
+    sender.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    return sender;
+}
+
+ActiveParticipant BeginTransferringInstances::receiverWithRoleIdCode(ActiveParticipant receiver)
+{
+    receiver.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
+    return receiver;
 }
 
 }

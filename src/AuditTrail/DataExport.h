@@ -3,6 +3,8 @@
 #include "Message.h"
 
 #include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 #include "Event.h"
 #include "Media.h"
 #include "SOPClass.h"
@@ -15,39 +17,43 @@ namespace AuditTrail
 struct EntityParticipantObject;
 
 /*!
-    \brief  Describes the event of exporting data from a system, meaning that the data is leaving
-            control of the system's security domain (e.g. printing to paper, recording on film,
-            conversion to another format for storage in an EHR, writing to removable media, sending
-            via e-mail).
+    Describes the event of exporting data from a system, meaning that the data is leaving control of
+    the system's security domain (e.g. printing to paper, recording on film, conversion to another
+    format for storage in an EHR, writing to removable media, sending via e-mail).
 */
-class DataExport : public Message
+struct DataExport : public Message
 {
-public:
     DataExport(Outcome outcome, MediaType mediaType);
     ~DataExport();
 
     std::vector<IO::Node> createNodes() const override;
 
+    EntityEvent event;
+    EntityActiveParticipant medium;
+
     void addRemoteUser(ActiveParticipant remoteUser);
     void addRemoteProcess(ActiveParticipant remoteProcess);
+    std::vector<EntityActiveParticipant> remoteUsersAndProcesses;
 
-    void setExportingUser(ActiveParticipant exportingUser);
-    void setExportingProcess(ActiveParticipant exportingProcess);
+    void setExportingUser(ActiveParticipant user);
+    std::unique_ptr<EntityActiveParticipant> exportingUser;
 
-    void setMediaLabel(std::string mediaLabel) { m_mediaLabel = std::move(mediaLabel); }
+    void setExportingProcess(ActiveParticipant process);
+    std::unique_ptr<EntityActiveParticipant> exportingProcess;
+
+    void setMediaLabel(std::string mediaLabel);
 
     void addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses);
+    std::vector<EntityParticipantObject> studies;
+
     void addPatient(std::string patientId, std::string patientName = std::string());
+    std::vector<std::pair<std::string, std::string>> patients;
 
 private:
-    Outcome m_outcome;
-    std::vector<ActiveParticipant> m_remoteUsersAndProcesses;
-    std::unique_ptr<ActiveParticipant> m_exportingUser;
-    std::unique_ptr<ActiveParticipant> m_exportingProcess;
+    static ActiveParticipant mediumWithRoleIdCode(MediaType mediaType);
+    static std::string mediaId(MediaType mediaType, const std::string& label = std::string());
+
     MediaType m_mediaType;
-    std::string m_mediaLabel;
-    std::vector<EntityParticipantObject> m_studies;
-    std::vector<std::pair<std::string, std::string>> m_patients;
 };
 
 }

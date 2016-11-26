@@ -6,15 +6,14 @@
 namespace AuditTrail
 {
 
-class EntityActiveParticipant : public Entity
+struct EntityActiveParticipant : public Entity
 {
 public:
-    EntityActiveParticipant(ActiveParticipant participant);
+    explicit EntityActiveParticipant(ActiveParticipant participant);
 
     IO::Node toNode() const override;
 
-private:
-    ActiveParticipant m_participant;
+    ActiveParticipant participant;
 };
 
 }

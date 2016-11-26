@@ -1,16 +1,13 @@
 #include "DataExport.h"
 
-#include "EntityActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
-
 namespace AuditTrail
 {
 
 DataExport::DataExport(Outcome outcome, MediaType mediaType)
-    : m_outcome(outcome),
-      m_exportingUser(nullptr),
-      m_exportingProcess(nullptr),
+    : event(outcome, EventActionCode::Read, generateEventID(EventIDCode::Export)),
+      medium(mediumWithRoleIdCode(mediaType)),
+      exportingUser(nullptr),
+      exportingProcess(nullptr),
       m_mediaType(mediaType)
 {
 }
@@ -23,30 +20,23 @@ std::vector<IO::Node> DataExport::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Read, generateEventID(EventIDCode::Export));
     nodes.emplace_back(event.toNode());
 
-    for (const auto& remoteUserOrProcess : m_remoteUsersAndProcesses)
-        nodes.emplace_back(EntityActiveParticipant(remoteUserOrProcess).toNode());
+    for (const auto& remoteUserOrProcess : remoteUsersAndProcesses)
+        nodes.emplace_back(remoteUserOrProcess.toNode());
 
-    if (m_exportingUser)
-        nodes.emplace_back(EntityActiveParticipant(*m_exportingUser).toNode());
+    if (exportingUser)
+        nodes.emplace_back(exportingUser->toNode());
 
-    if (m_exportingProcess)
-        nodes.emplace_back(EntityActiveParticipant(*m_exportingProcess).toNode());
+    if (exportingProcess)
+        nodes.emplace_back(exportingProcess->toNode());
 
-    std::string mediaId = mediaTypeToString(m_mediaType);
-    if (!m_mediaLabel.empty())
-        mediaId += " " + m_mediaLabel;
+    nodes.emplace_back(medium.toNode());
 
-    ActiveParticipant media(mediaId, false);
-    media.roleIdCode = generateRoleIDCode(RoleIDCode::DestinationMedia);
-    nodes.emplace_back(EntityActiveParticipant(media).toNode());
-
-    for (const auto& study : m_studies)
+    for (const auto& study : studies)
         nodes.emplace_back(study.toNode());
 
-    for (const auto& patient : m_patients)
+    for (const auto& patient : patients)
     {
         EntityParticipantObject patientEntity(
             EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
@@ -62,25 +52,30 @@ std::vector<IO::Node> DataExport::createNodes() const
 void DataExport::addRemoteUser(ActiveParticipant remoteUser)
 {
     remoteUser.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    m_remoteUsersAndProcesses.emplace_back(std::move(remoteUser));
+    remoteUsersAndProcesses.emplace_back(EntityActiveParticipant(std::move(remoteUser)));
 }
 
 void DataExport::addRemoteProcess(ActiveParticipant remoteProcess)
 {
     remoteProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    m_remoteUsersAndProcesses.emplace_back(std::move(remoteProcess));
+    remoteUsersAndProcesses.emplace_back(EntityActiveParticipant(std::move(remoteProcess)));
 }
 
-void DataExport::setExportingUser(ActiveParticipant exportingUser)
+void DataExport::setExportingUser(ActiveParticipant user)
 {
-    exportingUser.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    m_exportingUser = std::make_unique<ActiveParticipant>(exportingUser);
+    user.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    exportingUser = std::make_unique<EntityActiveParticipant>(std::move(user));
 }
 
-void DataExport::setExportingProcess(ActiveParticipant exportingProcess)
+void DataExport::setExportingProcess(ActiveParticipant process)
 {
-    exportingProcess.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    m_exportingProcess = std::make_unique<ActiveParticipant>(exportingProcess);
+    process.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    exportingProcess = std::make_unique<EntityActiveParticipant>(std::move(process));
+}
+
+void DataExport::setMediaLabel(std::string mediaLabel)
+{
+    medium.participant.userId = mediaId(m_mediaType, mediaLabel);
 }
 
 void DataExport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
@@ -92,12 +87,27 @@ void DataExport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 
     study.setSOPClasses(std::move(sopClasses));
 
-    m_studies.emplace_back(std::move(study));
+    studies.emplace_back(std::move(study));
 }
 
-void DataExport::addPatient(std::string patientId, std::string patientName /*= std::string()*/)
+void DataExport::addPatient(std::string patientId, std::string patientName)
 {
-    m_patients.emplace_back(patientId, patientName);
+    patients.emplace_back(patientId, patientName);
+}
+
+ActiveParticipant DataExport::mediumWithRoleIdCode(MediaType mediaType)
+{
+    ActiveParticipant media(mediaTypeToString(mediaType), false);
+    media.roleIdCode = generateRoleIDCode(RoleIDCode::DestinationMedia);
+    return media;
+}
+
+std::string DataExport::mediaId(MediaType mediaType, const std::string& label)
+{
+    auto id = mediaTypeToString(mediaType);
+    if (!label.empty())
+        id += " " + label;
+    return id;
 }
 
 }
