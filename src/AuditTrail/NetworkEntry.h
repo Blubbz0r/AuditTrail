@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Message.h"
-#include "ActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityActiveParticipant.h"
 #include "Event.h"
 
 namespace AuditTrail
@@ -11,9 +12,8 @@ namespace AuditTrail
     Describes the event of a system, such as a mobile device, intentionally
     entering or leaving the network.
 */
-class NetworkEntry : public Message
+struct NetworkEntry : public Message
 {
-public:
     enum class Action
     {
         Attach,
@@ -28,10 +28,8 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
-private:
-    Outcome m_outcome;
-    Action m_action;
-    ActiveParticipant m_activeParticipant;
+    EntityEvent event;
+    EntityActiveParticipant activeParticipant;
 };
 
 }
