@@ -40,7 +40,8 @@ enum class EventIDCode
     NetworkEntry,
     Query,
     SecurityAlert,
-    StudyDeleted
+    StudyDeleted,
+    UserAuthentication
 };
 
 CodedValueType generateEventID(EventIDCode eventID);
@@ -50,7 +51,9 @@ enum class EventTypeCode
     ApplicationStart,
     ApplicationStop,
     Attach,
-    Detach
+    Detach,
+    Login,
+    Logout
 };
 
 CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode);

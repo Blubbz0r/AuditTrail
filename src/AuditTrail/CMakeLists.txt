@@ -25,6 +25,7 @@ add_library(
     SecurityAlert.h SecurityAlert.cpp
     SOPClass.h
     StudyDeleted.h StudyDeleted.cpp
+    UserAuthentication.h UserAuthentication.cpp
     Writer.h
     WriterPugixml.h WriterPugixml.cpp
 )

@@ -7,6 +7,7 @@ add_executable(
     LogNoop.h
     ApplicationActivityTests.cpp
     AuditLogUsedTests.cpp
+    UserAuthenticationTests.cpp
     BeginTransferringInstancesTests.cpp
     DataExportTests.cpp
     DataImportTests.cpp

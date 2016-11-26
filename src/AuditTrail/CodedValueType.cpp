@@ -58,6 +58,8 @@ CodedValueType generateEventID(EventIDCode eventID)
         return CodedValueType{ "EventID", "110113", "Security Alert" };
     case EventIDCode::StudyDeleted:
         return CodedValueType{"EventID", "110105", "DICOM Study Deleted"};
+    case EventIDCode::UserAuthentication:
+        return CodedValueType{ "EventID", "110114", "User Authentication" };
     default:
         throw std::logic_error("Unable to generate event id code from " + std::to_string(static_cast<int>(eventID)));
     }
@@ -75,6 +77,10 @@ CodedValueType generateEventTypeCode(EventTypeCode eventTypeCode)
         return CodedValueType{ "EventTypeCode", "110124", "Attach" };
     case EventTypeCode::Detach:
         return CodedValueType{ "EventTypeCode", "110125", "Detach" };
+    case EventTypeCode::Login:
+        return CodedValueType{ "EventTypeCode", "110122", "Login" };
+    case EventTypeCode::Logout:
+        return CodedValueType{ "EventTypeCode", "110123", "Logout" };
     default:
         throw std::logic_error("Unable to generate event type code from " + std::to_string(static_cast<int>(eventTypeCode)));
     }
