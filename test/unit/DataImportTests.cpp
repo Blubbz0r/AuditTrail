@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
 #include "DataImport.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,24 +12,16 @@ using namespace testing;
 class DataImportTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-
     void checkImportingUser(const Node& importingUser);
-    void checkRoleIDCodeImportingUser(const Node& roleIDCode);
 
     void checkSourceMedia(const Node& sourceMedia);
-    void checkRoleIDCodeSourceMedia(const Node& roleIDCode);
 
     void checkSource(const Node& source);
-    void checkRoleIDCodeSource(const Node& roleIDCode);
 
     void checkStudy(const Node& study);
-    void checkStudyIdTypeCode(const Node& idTypeCode);
     void checkDescription(const Node& description);
 
     void checkPatient(const Node& patient);
-    void checkPatientIDTypeCode(const Node& idTypeCode);
 };
 
 TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -47,11 +40,17 @@ TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(6));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "C", Outcome::MinorFailure);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110107", "Import");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkImportingUser(node);
 
@@ -72,46 +71,6 @@ TEST_F(DataImportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     checkPatient(node);
 }
 
-void DataImportTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("C"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::MinorFailure))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-}
-
-void DataImportTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110107"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Import"));
-}
-
 void DataImportTests::checkImportingUser(const Node& importingUser)
 {
     ASSERT_THAT(importingUser.attributes().size(), Eq(2));
@@ -128,24 +87,7 @@ void DataImportTests::checkImportingUser(const Node& importingUser)
 
     auto node = importingUser.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeImportingUser(node);
-}
-
-void DataImportTests::checkRoleIDCodeImportingUser(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110152"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Destination Role ID"));
+    checkCodedValueType(node, "110152", "Destination Role ID");
 }
 
 void DataImportTests::checkSourceMedia(const Node& sourceMedia)
@@ -164,24 +106,7 @@ void DataImportTests::checkSourceMedia(const Node& sourceMedia)
 
     auto node = sourceMedia.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeSourceMedia(node);
-}
-
-void DataImportTests::checkRoleIDCodeSourceMedia(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110155"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Source Media"));
+    checkCodedValueType(node, "110155", "Source Media");
 }
 
 void DataImportTests::checkSource(const Node& source)
@@ -200,24 +125,7 @@ void DataImportTests::checkSource(const Node& source)
 
     auto node = source.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeSource(node);
-}
-
-void DataImportTests::checkRoleIDCodeSource(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110153"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Source Role ID"));
+    checkCodedValueType(node, "110153", "Source Role ID");
 }
 
 void DataImportTests::checkStudy(const Node& study)
@@ -239,28 +147,11 @@ void DataImportTests::checkStudy(const Node& study)
     ASSERT_THAT(study.nodes().size(), Eq(2));
     auto node = study.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkStudyIdTypeCode(node);
+    checkCodedValueType(node, "110180", "Study Instance UID");
 
     node = study.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectDescription"));
     checkDescription(node);
-}
-
-void DataImportTests::checkStudyIdTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(3));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110180"));
-
-    attribute = idTypeCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = idTypeCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Study Instance UID"));
 }
 
 void DataImportTests::checkDescription(const Node& description)
@@ -301,18 +192,9 @@ void DataImportTests::checkPatient(const Node& patient)
     ASSERT_THAT(patient.nodes().size(), Eq(2));
     auto node = patient.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkPatientIDTypeCode(node);
+    checkCodedValueType(node, "2");
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
     ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
-}
-
-void DataImportTests::checkPatientIDTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("2"));
 }

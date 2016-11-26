@@ -7,8 +7,8 @@ add_executable(
     LogNoop.h
     ApplicationActivityTests.cpp
     AuditLogUsedTests.cpp
-    UserAuthenticationTests.cpp
     BeginTransferringInstancesTests.cpp
+    CodedValueTypeTests.h CodedValueTypeTests.cpp
     DataExportTests.cpp
     DataImportTests.cpp
     InstancesAccessedTests.cpp
@@ -19,6 +19,7 @@ add_executable(
     StudyDeletedTests.cpp
     TestData.h
     Tests.cpp
+    UserAuthenticationTests.cpp
     WriterMock.h
 )
 

@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 
 #include "SecurityAlert.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,17 +12,11 @@ using namespace testing;
 class SecurityAlertTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-    void checkEventTypeCode(const Node& eventTypeCode);
-
     void checkReportingPerson(const Node& reportingPerson);
 
     void checkPerformingProcess(const Node& performingProcess);
 
     void checkAlertSubject(const Node& alertSubject);
-    void checkAlertSubjectIdTypeCode(const Node& idTypeCode);
-    void checkDescription(const Node& description);
 };
 
 TEST_F(SecurityAlertTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -35,11 +30,21 @@ TEST_F(SecurityAlertTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(4));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "E", Outcome::Success);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(2));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110113", "Security Alert");
+
+    auto eventTypeCode = eventIdentification.nodes().at(1);
+    ASSERT_THAT(eventTypeCode.name(), Eq("EventTypeCode"));
+    checkCodedValueType(eventTypeCode, "110126", "Node Authentication");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkReportingPerson(node);
 
@@ -50,67 +55,6 @@ TEST_F(SecurityAlertTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[3];
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
     checkAlertSubject(node);
-}
-
-void SecurityAlertTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("E"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::Success))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(2));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-
-    node = eventIdentification.nodes().at(1);
-    ASSERT_THAT(node.name(), Eq("EventTypeCode"));
-    checkEventTypeCode(node);
-}
-
-void SecurityAlertTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110113"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Security Alert"));
-}
-
-void SecurityAlertTests::checkEventTypeCode(const Node& eventTypeCode)
-{
-    ASSERT_THAT(eventTypeCode.attributes().size(), Eq(3));
-
-    auto attribute = eventTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110126"));
-
-    attribute = eventTypeCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventTypeCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Node Authentication"));
 }
 
 void SecurityAlertTests::checkReportingPerson(const Node& reportingPerson)
@@ -163,14 +107,5 @@ void SecurityAlertTests::checkAlertSubject(const Node& alertSubject)
 
     auto node = alertSubject.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkAlertSubjectIdTypeCode(node);
-}
-
-void SecurityAlertTests::checkAlertSubjectIdTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("12"));
+    checkCodedValueType(node, "12");
 }

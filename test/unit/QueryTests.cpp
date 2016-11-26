@@ -1,6 +1,7 @@
 #include <gmock/gmock.h>
 
 #include "Query.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,12 +12,7 @@ using namespace testing;
 class QueryTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-
     void checkQueryingProcess(const Node& queryingProcess);
-    void checkRoleCodeId(const Node& roleCodeId, const std::string& code,
-                         const std::string& displayName);
 
     void checkQueriedProcess(const Node& queriedProcess);
 
@@ -35,11 +31,17 @@ TEST_F(QueryTests, createNodes_WithAllAtrributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(4));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "E", Outcome::Success);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110112", "Query");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkQueryingProcess(node);
 
@@ -50,46 +52,6 @@ TEST_F(QueryTests, createNodes_WithAllAtrributes_ReturnsCorrectNodes)
     node = nodes[3];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkOtherProcess(node);
-}
-
-void QueryTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("E"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // TODO: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::Success))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-}
-
-void QueryTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110112"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Query"));
 }
 
 void QueryTests::checkQueryingProcess(const Node& queryingProcess)
@@ -106,25 +68,7 @@ void QueryTests::checkQueryingProcess(const Node& queryingProcess)
 
     ASSERT_THAT(queryingProcess.nodes().size(), Eq(1));
     auto node = queryingProcess.nodes().at(0);
-    checkRoleCodeId(node, "110153", "Source Role ID");
-}
-
-void QueryTests::checkRoleCodeId(const Node& roleCodeId, const std::string& code,
-                                 const std::string& displayName)
-{
-    ASSERT_THAT(roleCodeId.attributes().size(), Eq(3));
-
-    auto attribute = roleCodeId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq(code));
-
-    attribute = roleCodeId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleCodeId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq(displayName));
+    checkCodedValueType(node, "110153", "Source Role ID");
 }
 
 void QueryTests::checkQueriedProcess(const Node& queriedProcess)
@@ -141,7 +85,7 @@ void QueryTests::checkQueriedProcess(const Node& queriedProcess)
 
     ASSERT_THAT(queriedProcess.nodes().size(), Eq(1));
     auto node = queriedProcess.nodes().at(0);
-    checkRoleCodeId(node, "110152", "Destination Role ID");
+    checkCodedValueType(node, "110152", "Destination Role ID");
 }
 
 void QueryTests::checkOtherProcess(const Node& otherProcess)

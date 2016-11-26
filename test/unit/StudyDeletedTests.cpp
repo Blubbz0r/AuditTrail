@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
 #include "StudyDeleted.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,17 +12,12 @@ using namespace testing;
 class StudyDeletedTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-
     void checkDeletingPerson(const Node& deletingPerson);
 
     void checkStudy(const Node& study);
-    void checkStudyIdTypeCode(const Node& idTypeCode);
     void checkDescription(const Node& description);
 
     void checkPatient(const Node& patient);
-    void checkPatientIDTypeCode(const Node& idTypeCode);
 };
 
 TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -39,11 +35,17 @@ TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(4));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "D", Outcome::MinorFailure);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110105", "DICOM Study Deleted");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkDeletingPerson(node);
 
@@ -54,46 +56,6 @@ TEST_F(StudyDeletedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[3];
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
     checkPatient(node);
-}
-
-void StudyDeletedTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("D"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::MinorFailure))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-}
-
-void StudyDeletedTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110105"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("DICOM Study Deleted"));
 }
 
 void StudyDeletedTests::checkDeletingPerson(const Node& deletingPerson)
@@ -131,28 +93,11 @@ void StudyDeletedTests::checkStudy(const Node& study)
 
     auto node = study.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkStudyIdTypeCode(node);
+    checkCodedValueType(node, "110180", "Study Instance UID");
 
     node = study.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectDescription"));
     checkDescription(node);
-}
-
-void StudyDeletedTests::checkStudyIdTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(3));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110180"));
-
-    attribute = idTypeCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = idTypeCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Study Instance UID"));
 }
 
 void StudyDeletedTests::checkDescription(const Node& description)
@@ -193,18 +138,9 @@ void StudyDeletedTests::checkPatient(const Node& patient)
     ASSERT_THAT(patient.nodes().size(), Eq(2));
     auto node = patient.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkPatientIDTypeCode(node);
+    checkCodedValueType(node, "2");
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
     ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
-}
-
-void StudyDeletedTests::checkPatientIDTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("2"));
 }

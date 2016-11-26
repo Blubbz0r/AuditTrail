@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
 #include "AuditLogUsed.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,14 +12,10 @@ using namespace testing;
 class AuditLogUsedTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-
     void checkActiveParticipantApplication(const Node& activeParticipant);
     void checkActiveParticipantUser(const Node& activeParticipant);
 
     void checkParticipantObject(const Node& participantObject);
-    void checkParticipantObjectIDTypeCode(const Node& idTypeCode);
     void checkParticipantObjectName(const Node& objectName);
 };
 
@@ -45,11 +42,17 @@ TEST_F(AuditLogUsedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(4));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "R", Outcome::MinorFailure);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110101", "Audit Log Used");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkActiveParticipantApplication(node);
 
@@ -60,46 +63,6 @@ TEST_F(AuditLogUsedTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     node = nodes[3];
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIdentification"));
     checkParticipantObject(node);
-}
-
-void AuditLogUsedTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("R"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::MinorFailure))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-}
-
-void AuditLogUsedTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110101"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Audit Log Used"));
 }
 
 void AuditLogUsedTests::checkActiveParticipantApplication(const Node& activeParticipant)
@@ -180,20 +143,11 @@ void AuditLogUsedTests::checkParticipantObject(const Node& participantObject)
 
     auto node = participantObject.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkParticipantObjectIDTypeCode(node);
+    checkCodedValueType(node, "12");
 
     node = participantObject.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
     checkParticipantObjectName(node);
-}
-
-void AuditLogUsedTests::checkParticipantObjectIDTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("12"));
 }
 
 void AuditLogUsedTests::checkParticipantObjectName(const Node& objectName)

@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
 #include "DataExport.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,24 +12,16 @@ using namespace testing;
 class DataExportTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-
     void checkRemoteUser(const Node& remoteUser);
-    void checkRoleIDCodeRemoteUser(const Node& roleIDCode);
 
     void checkExportingUser(const Node& exportingUser);
-    void checkRoleIDCodeExportingUser(const Node& roleIDCode);
 
     void checkMedia(const Node& media);
-    void checkRoleIDCodeMedia(const Node& roleIDCode);
 
     void checkStudy(const Node& study);
-    void checkStudyIdTypeCode(const Node& idTypeCode);
     void checkDescription(const Node& description);
 
     void checkPatient(const Node& patient);
-    void checkPatientIDTypeCode(const Node& idTypeCode);
 };
 
 TEST_F(DataExportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -48,11 +41,17 @@ TEST_F(DataExportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
 
     ASSERT_THAT(nodes.size(), Eq(6));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "R", Outcome::Success);
 
-    node = nodes[1];
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
+
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110106", "Export");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkRemoteUser(node);
 
@@ -73,46 +72,6 @@ TEST_F(DataExportTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
     checkPatient(node);
 }
 
-void DataExportTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("R"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::Success))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(1));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-}
-
-void DataExportTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110106"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Export"));
-}
-
 void DataExportTests::checkRemoteUser(const Node& remoteUser)
 {
     ASSERT_THAT(remoteUser.attributes().size(), Eq(2));
@@ -129,24 +88,7 @@ void DataExportTests::checkRemoteUser(const Node& remoteUser)
 
     auto node = remoteUser.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeRemoteUser(node);
-}
-
-void DataExportTests::checkRoleIDCodeRemoteUser(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110152"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Destination Role ID"));
+    checkCodedValueType(node, "110152", "Destination Role ID");
 }
 
 void DataExportTests::checkExportingUser(const Node& exportingUser)
@@ -165,24 +107,7 @@ void DataExportTests::checkExportingUser(const Node& exportingUser)
 
     auto node = exportingUser.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeExportingUser(node);
-}
-
-void DataExportTests::checkRoleIDCodeExportingUser(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110153"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Source Role ID"));
+    checkCodedValueType(node, "110153", "Source Role ID");
 }
 
 void DataExportTests::checkMedia(const Node& media)
@@ -201,24 +126,7 @@ void DataExportTests::checkMedia(const Node& media)
 
     auto node = media.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIDCodeMedia(node);
-}
-
-void DataExportTests::checkRoleIDCodeMedia(const Node& roleIDCode)
-{
-    ASSERT_THAT(roleIDCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIDCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110154"));
-
-    attribute = roleIDCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIDCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Destination Media"));
+    checkCodedValueType(node, "110154", "Destination Media");
 }
 
 void DataExportTests::checkStudy(const Node& study)
@@ -240,28 +148,11 @@ void DataExportTests::checkStudy(const Node& study)
     ASSERT_THAT(study.nodes().size(), Eq(2));
     auto node = study.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkStudyIdTypeCode(node);
+    checkCodedValueType(node, "110180", "Study Instance UID");
 
     node = study.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectDescription"));
     checkDescription(node);
-}
-
-void DataExportTests::checkStudyIdTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(3));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110180"));
-
-    attribute = idTypeCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = idTypeCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Study Instance UID"));
 }
 
 void DataExportTests::checkDescription(const Node& description)
@@ -302,18 +193,9 @@ void DataExportTests::checkPatient(const Node& patient)
     ASSERT_THAT(patient.nodes().size(), Eq(2));
     auto node = patient.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectIDTypeCode"));
-    checkPatientIDTypeCode(node);
+    checkCodedValueType(node, "2");
 
     node = patient.nodes().at(1);
     ASSERT_THAT(node.name(), Eq("ParticipantObjectName"));
     ASSERT_THAT(node.value(), Eq(DICOM::ArbitraryPatientName));
-}
-
-void DataExportTests::checkPatientIDTypeCode(const Node& idTypeCode)
-{
-    ASSERT_THAT(idTypeCode.attributes().size(), Eq(1));
-
-    auto attribute = idTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("2"));
 }

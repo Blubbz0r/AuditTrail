@@ -1,6 +1,7 @@
 #include "gmock/gmock.h"
 
 #include "ApplicationActivity.h"
+#include "CodedValueTypeTests.h"
 #include "TestData.h"
 
 using namespace AuditTrail;
@@ -11,16 +12,10 @@ using namespace testing;
 class ApplicationActivityTests : public Test
 {
 public:
-    void checkEventIdentification(const Node& eventIdentification);
-    void checkEventId(const Node& eventId);
-    void checkEventTypeCode(const Node& eventTypeCode);
-
     void checkActiveParticipantApplication(const Node& activeParticipant);
-    void checkRoleIdCodeApplication(const Node& roleIdCode);
 
     void checkActiveParticipantInvolvedApplication(const Node& activeParticipant);
     void checkActiveParticipantInvolvedUser(const Node& activeParticipant);
-    void checkRoleIdCodeInvolvedEntity(const Node& roleIdCode);
 };
 
 TEST_F(ApplicationActivityTests, createNodes_WithAllAttributes_ReturnsCorrectNodes)
@@ -53,78 +48,26 @@ TEST_F(ApplicationActivityTests, createNodes_WithAllAttributes_ReturnsCorrectNod
 
     ASSERT_THAT(nodes.size(), Eq(4));
 
-    auto node = nodes[0];
-    ASSERT_THAT(node.name(), Eq("EventIdentification"));
-    checkEventIdentification(node);
+    auto eventIdentification = nodes[0];
+    ASSERT_THAT(eventIdentification.name(), Eq("EventIdentification"));
+    checkEventIdentification(eventIdentification, "E", Outcome::MajorFailure);
+    ASSERT_THAT(eventIdentification.nodes().size(), Eq(2));
 
-    node = nodes[1];
+    auto eventId = eventIdentification.nodes().at(0);
+    ASSERT_THAT(eventId.name(), Eq("EventID"));
+    checkCodedValueType(eventId, "110100", "Application Activity");
+
+    auto eventTypeCode = eventIdentification.nodes().at(1);
+    ASSERT_THAT(eventTypeCode.name(), Eq("EventTypeCode"));
+    checkCodedValueType(eventTypeCode, "110121", "Application Stop");
+
+    auto node = nodes[1];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkActiveParticipantApplication(node);
 
     node = nodes[2];
     ASSERT_THAT(node.name(), Eq("ActiveParticipant"));
     checkActiveParticipantInvolvedApplication(node);
-}
-
-void ApplicationActivityTests::checkEventIdentification(const Node& eventIdentification)
-{
-    ASSERT_THAT(eventIdentification.attributes().size(), Eq(3));
-
-    auto attribute = eventIdentification.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("EventActionCode"));
-    EXPECT_THAT(attribute.value, Eq("E"));
-
-    attribute = eventIdentification.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("EventDateTime"));
-    // todo: how to check the date time?
-
-    attribute = eventIdentification.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("EventOutcomeIndicator"));
-    EXPECT_THAT(attribute.value, Eq(std::to_string(static_cast<int>(Outcome::MajorFailure))));
-
-    ASSERT_THAT(eventIdentification.nodes().size(), Eq(2));
-
-    auto node = eventIdentification.nodes().at(0);
-    ASSERT_THAT(node.name(), Eq("EventID"));
-    checkEventId(node);
-
-    node = eventIdentification.nodes().at(1);
-    ASSERT_THAT(node.name(), Eq("EventTypeCode"));
-    checkEventTypeCode(node);
-}
-
-void ApplicationActivityTests::checkEventId(const Node& eventId)
-{
-    ASSERT_THAT(eventId.attributes().size(), Eq(3));
-
-    auto attribute = eventId.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110100"));
-
-    attribute = eventId.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventId.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Application Activity"));
-}
-
-void ApplicationActivityTests::checkEventTypeCode(const Node& eventTypeCode)
-{
-    ASSERT_THAT(eventTypeCode.attributes().size(), Eq(3));
-
-    auto attribute = eventTypeCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110121"));
-
-    attribute = eventTypeCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = eventTypeCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Application Stop"));
 }
 
 void ApplicationActivityTests::checkActiveParticipantApplication(const Node& activeParticipant)
@@ -160,24 +103,7 @@ void ApplicationActivityTests::checkActiveParticipantApplication(const Node& act
 
     auto node = activeParticipant.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIdCodeApplication(node);
-}
-
-void ApplicationActivityTests::checkRoleIdCodeApplication(const Node& roleIdCode)
-{
-    ASSERT_THAT(roleIdCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIdCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110150"));
-
-    attribute = roleIdCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIdCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Application"));
+    checkCodedValueType(node, "110150", "Application");
 }
 
 void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
@@ -213,7 +139,7 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedApplication(
 
     auto node = activeParticipant.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIdCodeInvolvedEntity(node);
+    checkCodedValueType(node, "110151", "Application Launcher");
 }
 
 void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& activeParticipant)
@@ -248,22 +174,5 @@ void ApplicationActivityTests::checkActiveParticipantInvolvedUser(const Node& ac
 
     auto node = activeParticipant.nodes().at(0);
     ASSERT_THAT(node.name(), Eq("RoleIDCode"));
-    checkRoleIdCodeInvolvedEntity(node);
-}
-
-void ApplicationActivityTests::checkRoleIdCodeInvolvedEntity(const Node& roleIdCode)
-{
-    ASSERT_THAT(roleIdCode.attributes().size(), Eq(3));
-
-    auto attribute = roleIdCode.attributes().at(0);
-    ASSERT_THAT(attribute.name, Eq("code"));
-    EXPECT_THAT(attribute.value, Eq("110151"));
-
-    attribute = roleIdCode.attributes().at(1);
-    ASSERT_THAT(attribute.name, Eq("codeSystemName"));
-    EXPECT_THAT(attribute.value, Eq("DCM"));
-
-    attribute = roleIdCode.attributes().at(2);
-    ASSERT_THAT(attribute.name, Eq("displayName"));
-    EXPECT_THAT(attribute.value, Eq("Application Launcher"));
+    checkCodedValueType(node, "110151", "Application Launcher");
 }
