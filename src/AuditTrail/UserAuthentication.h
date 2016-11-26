@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Message.h"
-#include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
 #include "Event.h"
 
 #include <memory>
@@ -16,9 +17,8 @@ namespace AuditTrail
     \note   The user usually has ActiveParticpant::userIsRequestor TRUE, but in the case of a logout
             timer, the Node might be the ActiveParticpant::userIsRequestor.
 */
-class UserAuthentication : public Message
+struct UserAuthentication : public Message
 {
-public:
     enum class Type
     {
         Login,
@@ -29,13 +29,11 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
-    void setAuthenticatingSystem(ActiveParticipant authenticatingSystem);
+    EntityEvent event;
+    EntityActiveParticipant authenticatedPerson;
 
-private:
-    Outcome m_outcome;
-    Type m_type;
-    ActiveParticipant m_authenticatedPerson;
-    std::unique_ptr<ActiveParticipant> m_authenticatingSystem;
+    void setAuthenticatingSystem(ActiveParticipant system);
+    std::unique_ptr<EntityActiveParticipant> authenticatingSystem;
 };
 
 }
