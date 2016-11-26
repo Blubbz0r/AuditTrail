@@ -8,7 +8,7 @@ using namespace pugi;
 namespace IO
 {
 
-WriterPugiXml::WriterPugiXml(std::string filePath) : m_filePath(std::move(filePath)) {}
+WriterPugiXml::WriterPugiXml(std::tr2::sys::path filePath) : m_filePath(std::move(filePath)) {}
 
 void iterateNodes(xml_node& xmlNode, const std::vector<Node>& nodes)
 {
@@ -35,8 +35,8 @@ void WriterPugiXml::write(const std::vector<Node>& nodes)
     auto rootNode = doc.append_child("AuditMessage");
     iterateNodes(rootNode, nodes);
 
-    if (!doc.save_file(m_filePath.c_str()))
-        Logger->error("Failed to save xml file '" + m_filePath + "'");
+    if (!doc.save_file(m_filePath.c_str(), "\t", format_default, encoding_utf8))
+        Logger->error("Failed to save xml file '" + m_filePath.string() + "'");
 }
 
 }

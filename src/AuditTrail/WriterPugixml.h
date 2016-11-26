@@ -2,6 +2,8 @@
 
 #include "Writer.h"
 
+#include <filesystem>
+
 namespace IO
 {
 
@@ -11,12 +13,12 @@ namespace IO
 class WriterPugiXml : public Writer
 {
 public:
-    WriterPugiXml(std::string filePath);
+    explicit WriterPugiXml(std::tr2::sys::path filePath);
 
     void write(const std::vector<Node>& nodes) override;
 
 private:
-    std::string m_filePath;
+    std::tr2::sys::path m_filePath;
 };
 
 }
