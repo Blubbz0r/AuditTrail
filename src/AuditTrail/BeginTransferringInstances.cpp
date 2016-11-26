@@ -8,12 +8,14 @@ BeginTransferringInstances::BeginTransferringInstances(Outcome outcome, ActivePa
                                                        std::string patientId)
     : event(outcome, EventActionCode::Execute,
             generateEventID(EventIDCode::BeginTransferringInstances)),
-      sendingProcess(senderWithRoleIdCode(std::move(sender))),
-      receivingProcess(receiverWithRoleIdCode(std::move(receiver))),
+      sendingProcess(std::move(sender)),
+      receivingProcess(std::move(receiver)),
       patient(EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
               generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
               std::move(patientId))
 {
+    this->sendingProcess.participant.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    this->receivingProcess.participant.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
 }
 
 BeginTransferringInstances::~BeginTransferringInstances()
@@ -60,18 +62,6 @@ void BeginTransferringInstances::addStudy(std::string studyInstanceUid,
 void BeginTransferringInstances::setPatientName(std::string patientName)
 {
     patient.objectNameOrQuery = std::move(patientName);
-}
-
-    ActiveParticipant BeginTransferringInstances::senderWithRoleIdCode(ActiveParticipant sender)
-{
-    sender.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    return sender;
-}
-
-ActiveParticipant BeginTransferringInstances::receiverWithRoleIdCode(ActiveParticipant receiver)
-{
-    receiver.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    return receiver;
 }
 
 }

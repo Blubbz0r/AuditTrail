@@ -8,12 +8,14 @@ InstancesTransferred::InstancesTransferred(Outcome outcome, Action action,
                                            ActiveParticipant receivingProcess,
                                            std::string patientId)
     : event(outcome, toActionCode(action), generateEventID(EventIDCode::InstancesTransferred)),
-      sendingProcess(senderWithRoleIdCode(std::move(sendingProcess))),
-      receivingProcess(receiverWithRoleIdCode(std::move(receivingProcess))),
+      sendingProcess(std::move(sendingProcess)),
+      receivingProcess(std::move(receivingProcess)),
       patient(EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
               generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
               std::move(patientId))
 {
+    this->sendingProcess.participant.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
+    this->receivingProcess.participant.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
 }
 
 InstancesTransferred::~InstancesTransferred()
@@ -73,18 +75,6 @@ EventActionCode InstancesTransferred::toActionCode(Action action)
     default:
         throw std::logic_error("Unable to convert action " + std::to_string(static_cast<int>(action)) + " to string.");
     }
-}
-
-ActiveParticipant InstancesTransferred::senderWithRoleIdCode(ActiveParticipant sender)
-{
-    sender.roleIdCode = generateRoleIDCode(RoleIDCode::Source);
-    return sender;
-}
-
-ActiveParticipant InstancesTransferred::receiverWithRoleIdCode(ActiveParticipant receiver)
-{
-    receiver.roleIdCode = generateRoleIDCode(RoleIDCode::Destination);
-    return receiver;
 }
 
 }

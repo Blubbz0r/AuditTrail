@@ -28,7 +28,7 @@ struct DataImport : public Message
     std::vector<IO::Node> createNodes() const override;
 
     EntityEvent event;
-    EntityActiveParticipant sourceMedium;
+    EntityActiveParticipant sourceMedia;
 
     void addImportingUser(ActiveParticipant importingUser);
     std::vector<EntityActiveParticipant> importingUsers;
@@ -44,9 +44,6 @@ struct DataImport : public Message
 
     void addPatient(std::string patientId, std::string patientName = std::string());
     std::vector<EntityParticipantObject> patients;
-
-private:
-    static ActiveParticipant mediumWithRoleIdCode(Media media);
 };
 
 }

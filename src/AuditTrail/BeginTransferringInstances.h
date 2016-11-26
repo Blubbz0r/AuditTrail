@@ -38,10 +38,6 @@ struct BeginTransferringInstances : public Message
     std::vector<EntityParticipantObject> studies;
 
     void setPatientName(std::string patientName);
-
-private:
-    static ActiveParticipant senderWithRoleIdCode(ActiveParticipant sender);
-    static ActiveParticipant receiverWithRoleIdCode(ActiveParticipant receiver);
 };
 
 }

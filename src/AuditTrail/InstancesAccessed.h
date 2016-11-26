@@ -48,7 +48,7 @@ struct InstancesAccessed : public Message
     void setPatientName(std::string patientName);
 
 private:
-    static EventActionCode actionToActionCode(Action action);
+    static EventActionCode toActionCode(Action action);
 };
 
 }

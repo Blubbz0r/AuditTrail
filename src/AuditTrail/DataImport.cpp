@@ -1,16 +1,13 @@
 #include "DataImport.h"
 
-#include "EntityActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
-
 namespace AuditTrail
 {
 
 DataImport::DataImport(Outcome outcome, Media sourceMedia)
     : event(outcome, EventActionCode::Create, generateEventID(EventIDCode::Import)),
-      sourceMedium(mediumWithRoleIdCode(std::move(sourceMedia)))
+    sourceMedia(ActiveParticipant(sourceMedia.mediaId(), false))
 {
+    this->sourceMedia.participant.roleIdCode = generateRoleIDCode(RoleIDCode::SourceMedia);
 }
 
 DataImport::~DataImport()
@@ -29,7 +26,7 @@ std::vector<IO::Node> DataImport::createNodes() const
     for (const auto& importingProcess : importingProcesses)
         nodes.emplace_back(EntityActiveParticipant(importingProcess).toNode());
 
-    nodes.emplace_back(sourceMedium.toNode());
+    nodes.emplace_back(sourceMedia.toNode());
 
     for (const auto& source : sources)
         nodes.emplace_back(EntityActiveParticipant(source).toNode());
@@ -80,13 +77,6 @@ void DataImport::addPatient(std::string patientId, std::string patientName)
         generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), patientId);
     patientEntity.objectNameOrQuery = patientName;
     patients.emplace_back(std::move(patientEntity));
-}
-
-ActiveParticipant DataImport::mediumWithRoleIdCode(Media media)
-{
-    ActiveParticipant medium(media.mediaId(), false);
-    medium.roleIdCode = generateRoleIDCode(RoleIDCode::SourceMedia);
-    return medium;
 }
 
 }

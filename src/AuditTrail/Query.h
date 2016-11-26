@@ -1,8 +1,11 @@
 #pragma once
 
 #include "Message.h"
-#include "Event.h"
 #include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "Event.h"
+#include "EntityParticipantObject.h"
 
 namespace AuditTrail
 {
@@ -29,24 +32,21 @@ namespace AuditTrail
 
     \todo   ParticipantObjectDetail is MC, but EntityParticipantObject does not support it yet.
 */
-class Query : public Message
+struct Query : public Message
 {
-public:
     Query(Outcome outcome, ActiveParticipant queryingProcess, ActiveParticipant queriedProcess,
           std::string queriedSOPClassUID, std::string base64Dataset);
 
     std::vector<IO::Node> createNodes() const override;
 
+    EntityEvent event;
+    EntityActiveParticipant queryingProcess;
+    EntityActiveParticipant queriedProcess;
+    EntityParticipantObject queriedSop;
+
     /*! Other participants that are known, especially third parties that requested the query */
     void addOtherParticipant(ActiveParticipant otherParticipant);
-
-private:
-    Outcome m_outcome;
-    ActiveParticipant m_queryingProcess;
-    ActiveParticipant m_queriedProcess;
-    std::string m_queriedSOPClassUID;
-    std::string m_base64Dataset;
-    std::vector<ActiveParticipant> m_otherParticipants;
+    std::vector<EntityActiveParticipant> otherParticipants;
 };
 
 }

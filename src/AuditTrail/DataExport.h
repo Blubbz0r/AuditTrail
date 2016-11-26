@@ -30,7 +30,7 @@ struct DataExport : public Message
     std::vector<IO::Node> createNodes() const override;
 
     EntityEvent event;
-    EntityActiveParticipant medium;
+    EntityActiveParticipant media;
 
     void addRemoteUser(ActiveParticipant remoteUser);
     void addRemoteProcess(ActiveParticipant remoteProcess);
@@ -51,7 +51,6 @@ struct DataExport : public Message
     std::vector<std::pair<std::string, std::string>> patients;
 
 private:
-    static ActiveParticipant mediumWithRoleIdCode(MediaType mediaType);
     static std::string mediaId(MediaType mediaType, const std::string& label = std::string());
 
     MediaType m_mediaType;

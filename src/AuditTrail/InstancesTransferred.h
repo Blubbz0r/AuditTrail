@@ -47,8 +47,6 @@ struct InstancesTransferred : public Message
 
 private:
     static EventActionCode toActionCode(Action action);
-    static ActiveParticipant senderWithRoleIdCode(ActiveParticipant sender);
-    static ActiveParticipant receiverWithRoleIdCode(ActiveParticipant receiver);
 };
 
 }

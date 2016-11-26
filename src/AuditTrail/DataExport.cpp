@@ -5,11 +5,12 @@ namespace AuditTrail
 
 DataExport::DataExport(Outcome outcome, MediaType mediaType)
     : event(outcome, EventActionCode::Read, generateEventID(EventIDCode::Export)),
-      medium(mediumWithRoleIdCode(mediaType)),
+      media(ActiveParticipant(mediaTypeToString(mediaType), false)),
       exportingUser(nullptr),
       exportingProcess(nullptr),
       m_mediaType(mediaType)
 {
+    media.participant.roleIdCode = generateRoleIDCode(RoleIDCode::DestinationMedia);
 }
 
 DataExport::~DataExport()
@@ -31,7 +32,7 @@ std::vector<IO::Node> DataExport::createNodes() const
     if (exportingProcess)
         nodes.emplace_back(exportingProcess->toNode());
 
-    nodes.emplace_back(medium.toNode());
+    nodes.emplace_back(media.toNode());
 
     for (const auto& study : studies)
         nodes.emplace_back(study.toNode());
@@ -75,7 +76,7 @@ void DataExport::setExportingProcess(ActiveParticipant process)
 
 void DataExport::setMediaLabel(std::string mediaLabel)
 {
-    medium.participant.userId = mediaId(m_mediaType, mediaLabel);
+    media.participant.userId = mediaId(m_mediaType, mediaLabel);
 }
 
 void DataExport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> sopClasses)
@@ -93,13 +94,6 @@ void DataExport::addStudy(std::string studyInstanceUid, std::vector<SOPClass> so
 void DataExport::addPatient(std::string patientId, std::string patientName)
 {
     patients.emplace_back(patientId, patientName);
-}
-
-ActiveParticipant DataExport::mediumWithRoleIdCode(MediaType mediaType)
-{
-    ActiveParticipant media(mediaTypeToString(mediaType), false);
-    media.roleIdCode = generateRoleIDCode(RoleIDCode::DestinationMedia);
-    return media;
 }
 
 std::string DataExport::mediaId(MediaType mediaType, const std::string& label)

@@ -7,7 +7,7 @@ namespace AuditTrail
 {
 
 InstancesAccessed::InstancesAccessed(Outcome outcome, Action action, std::string patientId)
-    : event(outcome, actionToActionCode(action), generateEventID(EventIDCode::InstancesAccessed)),
+    : event(outcome, toActionCode(action), generateEventID(EventIDCode::InstancesAccessed)),
       patient(EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
               generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
               std::move(patientId)),
@@ -66,7 +66,7 @@ void InstancesAccessed::setPatientName(std::string patientName)
     patient.objectNameOrQuery = std::move(patientName);
 }
 
-EventActionCode InstancesAccessed::actionToActionCode(Action action)
+EventActionCode InstancesAccessed::toActionCode(Action action)
 {
     switch (action)
     {
