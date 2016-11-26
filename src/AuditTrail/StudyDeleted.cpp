@@ -1,17 +1,15 @@
 #include "StudyDeleted.h"
 
-#include "EntityActiveParticipant.h"
-#include "EntityEvent.h"
-#include "EntityParticipantObject.h"
-
 namespace AuditTrail
 {
 
 StudyDeleted::StudyDeleted(Outcome outcome, std::string patientID)
-    : m_outcome(outcome),
-      m_deletingPerson(nullptr),
-      m_deletingProcess(nullptr),
-      m_patientID(std::move(patientID))
+    : event(outcome, EventActionCode::Delete, generateEventID(EventIDCode::StudyDeleted)),
+      patient(EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
+              generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId),
+              std::move(patientID)),
+      deletingPerson(nullptr),
+      deletingProcess(nullptr)
 {
 }
 
@@ -23,37 +21,30 @@ std::vector<IO::Node> StudyDeleted::createNodes() const
 {
     std::vector<IO::Node> nodes;
 
-    EntityEvent event(m_outcome, EventActionCode::Delete,
-                      generateEventID(EventIDCode::StudyDeleted));
     nodes.emplace_back(event.toNode());
 
-    if (m_deletingPerson)
-        nodes.emplace_back(EntityActiveParticipant(*m_deletingPerson).toNode());
+    if (deletingPerson)
+        nodes.emplace_back(deletingPerson->toNode());
 
-    if (m_deletingProcess)
-        nodes.emplace_back(EntityActiveParticipant(*m_deletingProcess).toNode());
+    if (deletingProcess)
+        nodes.emplace_back(deletingProcess->toNode());
 
-    for (const auto& study : m_studies)
+    for (const auto& study : studies)
         nodes.emplace_back(EntityParticipantObject(study).toNode());
 
-    EntityParticipantObject patient(
-        EntityParticipantObject::Type::Person, EntityParticipantObject::Role::Patient,
-        generateParticipantObjectIDTypeCode(ParticipantObjectIDTypeCode::PatientId), m_patientID);
-
-    patient.objectNameOrQuery = m_patientName;
     nodes.emplace_back(patient.toNode());
 
     return nodes;
 }
 
-void StudyDeleted::setDeletingPerson(ActiveParticipant deletingPerson)
+void StudyDeleted::setDeletingPerson(ActiveParticipant person)
 {
-    m_deletingPerson = std::make_unique<ActiveParticipant>(deletingPerson);
+    deletingPerson = std::make_unique<EntityActiveParticipant>(std::move(person));
 }
 
-void StudyDeleted::setDeletingProcess(ActiveParticipant deletingProcess)
+void StudyDeleted::setDeletingProcess(ActiveParticipant process)
 {
-    m_deletingProcess = std::make_unique<ActiveParticipant>(deletingProcess);
+    deletingProcess = std::make_unique<EntityActiveParticipant>(std::move(process));
 }
 
 void StudyDeleted::addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses)
@@ -64,7 +55,12 @@ void StudyDeleted::addStudy(std::string studyInstanceUID, std::vector<SOPClass> 
         std::move(studyInstanceUID));
 
     study.setSOPClasses(std::move(sopClasses));
-    m_studies.emplace_back(std::move(study));
+    studies.emplace_back(std::move(study));
+}
+
+void StudyDeleted::setPatientName(std::string patientName)
+{
+    patient.objectNameOrQuery = std::move(patientName);
 }
 
 }

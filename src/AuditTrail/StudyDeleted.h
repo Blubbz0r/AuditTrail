@@ -2,7 +2,9 @@
 
 #include "Message.h"
 
-#include "ActiveParticipant.h"
+#include "EntityActiveParticipant.h"
+#include "EntityEvent.h"
+#include "EntityParticipantObject.h"
 #include "Event.h"
 #include "SOPClass.h"
 
@@ -14,8 +16,8 @@ namespace AuditTrail
 struct EntityParticipantObject;
 
 /*!
-    \brief  Describes the event of deletion of one or more studies and all associated SOP instances
-            in a single action.
+    Describes the event of deletion of one or more studies and all associated SOP instances in a
+    single action.
 */
 class StudyDeleted : public Message
 {
@@ -25,20 +27,19 @@ public:
 
     std::vector<IO::Node> createNodes() const override;
 
-    void setDeletingPerson(ActiveParticipant deletingPerson);
-    void setDeletingProcess(ActiveParticipant deletingProcess);
+    EntityEvent event;
+    EntityParticipantObject patient;
+
+    void setDeletingPerson(ActiveParticipant person);
+    std::unique_ptr<EntityActiveParticipant> deletingPerson;
+
+    void setDeletingProcess(ActiveParticipant process);
+    std::unique_ptr<EntityActiveParticipant> deletingProcess;
 
     void addStudy(std::string studyInstanceUID, std::vector<SOPClass> sopClasses);
+    std::vector<EntityParticipantObject> studies;
 
-    void setPatientName(std::string patientName) { m_patientName = std::move(patientName); }
-
-private:
-    Outcome m_outcome;
-    std::unique_ptr<ActiveParticipant> m_deletingPerson;
-    std::unique_ptr<ActiveParticipant> m_deletingProcess;
-    std::vector<EntityParticipantObject> m_studies;
-    std::string m_patientID;
-    std::string m_patientName;
+    void setPatientName(std::string patientName);
 };
 
 }
